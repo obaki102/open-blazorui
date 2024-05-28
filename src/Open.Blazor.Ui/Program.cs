@@ -1,5 +1,5 @@
 using Microsoft.FluentUI.AspNetCore.Components;
-using Open.Blazor.Ui;
+using Open.Blazor.Ui.Features.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
