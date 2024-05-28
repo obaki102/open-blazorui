@@ -5,10 +5,10 @@
 <h3>Basic Chat - Local llama 3</h3>
 
 <FluentStack Id="chatWindow" Orientation="Orientation.Vertical"
-             HorizontalAlignment="HorizontalAlignment.Start"
+             HorizontalAlignment="HorizontalAlignment.Center"
              VerticalAlignment="VerticalAlignment.Top"
              VerticalGap="20"
-             Style="height: 85%; border: 1px dotted var(--accent-fill-rest);margin:10px;overflow-y:auto;padding:10px">
+             Style="height: 85%;margin:10px;overflow-y:auto;padding:10px">
 
     @if (_chatMessages is not null)
     {
@@ -22,11 +22,9 @@
 <FluentStack Orientation="Orientation.Horizontal"
              HorizontalAlignment="HorizontalAlignment.Center"
              VerticalAlignment="VerticalAlignment.Bottom">
-    <FluentTextArea @bind-Value=_userMessage style="width:50%;margin-top:20px" Placeholder="Let's chat"></FluentTextArea>
+    <FluentTextArea @bind-Value=_userMessage style="width:700px;margin-top:20px" Placeholder="Let's chat"></FluentTextArea>
     <FluentButton IconStart="@(new Icons.Regular.Size16.Send())"
-                  Appearance="Appearance.Accent" OnClick="SendMessage">
-        Send
-    </FluentButton>
+                  Appearance="Appearance.Accent" OnClick="SendMessage"/>
 </FluentStack>
 
 @code {

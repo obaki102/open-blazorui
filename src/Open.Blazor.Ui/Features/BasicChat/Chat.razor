@@ -1,17 +1,9 @@
-﻿@if (Message is not null)
+﻿@using Markdig
+@if (Message is not null)
 {
-    <div>
-        @if (Message.Role == ChatRole.Assistant && string.IsNullOrEmpty(Message.Content))
-        {
-            <strong>@Message.Role:</strong>  
-           <FluentBadge Appearance="Appearance.Accent" Style="margin-left:2px">
-              ....
-            </FluentBadge>
-        }
-        else
-        {
-            <strong>@Message.Role:</strong> @Message.Content
-        }
+    <div style="width:700px">
+        <strong>@Message.Role:</strong>
+        @((MarkupString)Markdown.ToHtml(Message.Content ?? string.Empty))
     </div>
 }
 @code {

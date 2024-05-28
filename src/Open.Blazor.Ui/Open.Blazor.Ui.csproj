@@ -7,10 +7,19 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Features\BasicChat\Chat.razor.css" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="Features\BasicChat\Chat.razor.css" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.*-* " />
 		<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.*-* " />
 		<PackageReference Include="Microsoft.SemanticKernel" Version="1.13.0" />
 		<PackageReference Include="Microsoft.SemanticKernel.Planners.Handlebars" Version="1.13.0-preview" />
 		<PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.13.0-alpha" />
+		<PackageReference Include="Markdig" Version="0.37.0" />
 	</ItemGroup>
 </Project>
