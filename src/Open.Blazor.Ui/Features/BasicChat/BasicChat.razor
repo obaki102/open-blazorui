@@ -1,6 +1,7 @@
 ﻿@using Microsoft.SemanticKernel
 @using Microsoft.SemanticKernel.ChatCompletion
 @using Microsoft.SemanticKernel.Connectors.OpenAI
+@using System.Text
 @inject IJSRuntime JsRuntime
 <h3>Basic Chat - Local llama 3</h3>
 
@@ -24,7 +25,7 @@
              VerticalAlignment="VerticalAlignment.Bottom">
     <FluentTextArea @bind-Value=_userMessage style="width:700px;margin-top:20px" Placeholder="Let's chat"></FluentTextArea>
     <FluentButton IconStart="@(new Icons.Regular.Size16.Send())"
-                  Appearance="Appearance.Accent" OnClick="SendMessage"/>
+                  Appearance="Appearance.Accent" OnClick="SendMessage" />
 </FluentStack>
 
 @code {
@@ -86,9 +87,12 @@
         var assistantMessage = new ChatMessage { Role = ChatRole.Assistant, Content = string.Empty };
         _chatMessages.Add(assistantMessage);
         StateHasChanged();
+
+        var sb = new StringBuilder();
         await foreach (var content in result)
         {
-            assistantMessage.Content += content.Content;
+            sb.Append(content.Content);
+            assistantMessage.Content = sb.ToString();
             await InvokeAsync(StateHasChanged);
             await ScrollToBottom();
         }
