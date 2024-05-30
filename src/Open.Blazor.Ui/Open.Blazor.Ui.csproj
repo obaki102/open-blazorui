@@ -7,11 +7,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="Features\BasicChat\Chat.razor.css" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Content Include="Features\BasicChat\Chat.razor.css" />
+	  <None Remove="Features\Chat\Chat.razor.css" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -22,4 +18,11 @@
 		<PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.13.0-alpha" />
 		<PackageReference Include="Markdig" Version="0.37.0" />
 	</ItemGroup>
+
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="Open.Blazor.Tests" />
+
+	</ItemGroup>
+
 </Project>

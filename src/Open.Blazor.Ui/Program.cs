@@ -1,4 +1,5 @@
 using Microsoft.FluentUI.AspNetCore.Components;
+using Open.Blazor.Ui.Features.Chat;
 using Open.Blazor.Ui.Features.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddFluentUIComponents();
+builder.Services.AddChaServiceAsScoped();
 
 var app = builder.Build();
 
