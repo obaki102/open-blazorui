@@ -68,14 +68,10 @@ public class ChatServiceTests
         using (var cts = new CancellationTokenSource())
         {
             var task = service.StreamChatMessageContentAsync(kernel, discourse, onStreamCompletion, cts.Token);
-
-            // Assert - Before cancellation
             Assert.False(task.IsCompleted);
 
-            // Cancel the operation
             cts.Cancel();
 
-            // Assert - After cancellation
             await Assert.ThrowsAsync<TaskCanceledException>(() => task);
         }
     }

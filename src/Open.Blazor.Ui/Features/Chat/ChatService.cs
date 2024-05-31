@@ -3,13 +3,12 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using Open.Blazor.Ui.Features.Shared;
 
 namespace Open.Blazor.Ui.Features.Chat;
 
 internal sealed class ChatService
 {
-    private const string DEFAULT_BASEURL = "http://localhost:11434";
-
     public Kernel CreateKernel(string model)
     {
         ArgumentNullException.ThrowIfNull(model);
@@ -17,7 +16,7 @@ internal sealed class ChatService
         var kernel = Kernel.CreateBuilder()
             .AddOpenAIChatCompletion(
                 model,
-                new Uri(DEFAULT_BASEURL),
+                new Uri(Default.baseUrl),
                 apiKey: null)
             .Build();
         return kernel;
@@ -61,7 +60,7 @@ internal sealed class ChatService
 
 public static class ChatServiceExensions
 {
-    public static IServiceCollection AddChaServiceAsScoped(this IServiceCollection services)
+    public static IServiceCollection AddChatServiceAsScoped(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
 
