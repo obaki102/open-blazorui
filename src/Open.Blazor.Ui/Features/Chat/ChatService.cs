@@ -54,6 +54,8 @@ internal sealed class ChatService
             {
                 return discourse;
             }
+       
+
             fullMessage.Append(completionResult.Content);
             await onStreamCompletion.Invoke(completionResult.Content ?? string.Empty);
 

@@ -1,68 +1,107 @@
 
 using Open.Blazor.Ui.Features.Chat;
-using Microsoft.SemanticKernel;
 
+namespace Open.Blazor.Tests.ChatServiceTests;
 public class ChatServiceTests
 {
+    private const string Model = "llama3:latest";
 
+ 
     [Fact]
-    public void CreateKernel_ShouldCreateKernelWithValidModel()
+    public void Constructor_ShouldInitialize_WhenParametersAreValid()
     {
-        // Arrange
-        var chatService = new ChatService();
-        string model = "test-model";
-
-        // Act
-        var kernel = chatService.CreateKernel(model);
-
-        // Assert
-        Assert.NotNull(kernel);
+        var service = new ChatService();
+        Assert.NotNull(service);
     }
 
     [Fact]
     public void CreateKernel_ShouldThrowArgumentNullException_WhenModelIsNull()
     {
-        // Arrange
-        var chatService = new ChatService();
-
-        // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => chatService.CreateKernel(null));
+        var service = new ChatService();
+        Assert.Throws<ArgumentNullException>(() => service.CreateKernel(null));
     }
 
+    [Fact]
+    public void CreateKernel_ShouldReturnKernel_WhenModelIsValid()
+    {
+        var service = new ChatService();
+        var kernel = service.CreateKernel(Model);
+        Assert.NotNull(kernel);
+    }
 
     [Fact]
     public async Task ChatCompletionAsStreamAsync_ShouldThrowArgumentNullException_WhenKernelIsNull()
     {
-        // Arrange
-        var chatService = new ChatService();
+        var service = new ChatService();
         var discourse = new Discourse();
-        Func<string, Task> onStreamCompletion = content => Task.CompletedTask;
-
-        // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => chatService.ChatCompletionAsStreamAsync(null, discourse, onStreamCompletion));
+        Func<string, Task> onStreamCompletion = async _ => await Task.CompletedTask;
+        await Assert.ThrowsAsync<ArgumentNullException>(() => service.ChatCompletionAsStreamAsync(null, discourse, onStreamCompletion));
     }
 
     [Fact]
     public async Task ChatCompletionAsStreamAsync_ShouldThrowArgumentNullException_WhenDiscourseIsNull()
     {
-        // Arrange
-        var chatService = new ChatService();
-        var kernel = chatService.CreateKernel("test");
-        Func<string, Task> onStreamCompletion = content => Task.CompletedTask;
-
-        // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => chatService.ChatCompletionAsStreamAsync(kernel, null, onStreamCompletion));
+        var service = new ChatService();
+        var kernel = service.CreateKernel(Model);
+        Func<string, Task> onStreamCompletion = async _ => await Task.CompletedTask;
+        await Assert.ThrowsAsync<ArgumentNullException>(() => service.ChatCompletionAsStreamAsync(kernel, null, onStreamCompletion));
     }
 
     [Fact]
     public async Task ChatCompletionAsStreamAsync_ShouldThrowArgumentNullException_WhenOnStreamCompletionIsNull()
     {
-        // Arrange
-        var chatService = new ChatService();
-        var kernel = chatService.CreateKernel("test");
+        var service = new ChatService();
+        var kernel = service.CreateKernel(Model);
         var discourse = new Discourse();
-
-        // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => chatService.ChatCompletionAsStreamAsync(kernel, discourse, null));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => service.ChatCompletionAsStreamAsync(kernel, discourse, null));
     }
+
+    [Fact]
+    public async Task ChatCompletionAsStreamAsync_ShouldReturnDiscourse_WhenCancellationIsRequested()
+    {
+        // Not an actual unit test, the kernel is called directly so ollama must be up at this point.
+        var service = new ChatService();
+        var kernel = service.CreateKernel(Model);
+        var discourse = new Discourse();
+        Func<string, Task> onStreamCompletion = async _ => await Task.CompletedTask;
+
+        using (var cts = new CancellationTokenSource())
+        {
+            var task = service.ChatCompletionAsStreamAsync(kernel, discourse, onStreamCompletion, cts.Token);
+
+            // Assert - Before cancellation
+            Assert.False(task.IsCompleted);
+
+            // Cancel the operation
+            cts.Cancel();
+
+            // Assert - After cancellation
+            await Assert.ThrowsAsync<TaskCanceledException>(() => task);
+        }
+    }
+
+    [Fact]
+    public async Task ChatCompletionAsStreamAsync_ShouldProcessMessagesSuccessfully()
+    {
+        // Not an actual unit test, the kernel is called directly so ollama must be up at this point.
+        var service = new ChatService();
+        var kernel = service.CreateKernel(Model);
+        var discourse = new Discourse();
+        discourse.ChatMessages.Add(ChatMessage.New(ChatRole.User, "Hello"));
+        bool onStreamCompletionCalled = false;
+
+        Func<string, Task> onStreamCompletion = async message =>
+        {
+            onStreamCompletionCalled = true;
+            await Task.CompletedTask;
+        };
+
+        var result = await service.ChatCompletionAsStreamAsync(kernel, discourse, onStreamCompletion);
+
+  
+        Assert.True(onStreamCompletionCalled);
+
+        Assert.NotNull(result);
+    }
+
 }
