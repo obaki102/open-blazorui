@@ -35,7 +35,7 @@ public class ChatServiceTests
         var service = new ChatService();
         var discourse = new Discourse();
         Func<string, Task> onStreamCompletion = async _ => await Task.CompletedTask;
-        await Assert.ThrowsAsync<ArgumentNullException>(() => service.ChatCompletionAsStreamAsync(null, discourse, onStreamCompletion));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => service.StreamChatMessageContentAsync(null, discourse, onStreamCompletion));
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class ChatServiceTests
         var service = new ChatService();
         var kernel = service.CreateKernel(Model);
         Func<string, Task> onStreamCompletion = async _ => await Task.CompletedTask;
-        await Assert.ThrowsAsync<ArgumentNullException>(() => service.ChatCompletionAsStreamAsync(kernel, null, onStreamCompletion));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => service.StreamChatMessageContentAsync(kernel, null, onStreamCompletion));
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public class ChatServiceTests
         var service = new ChatService();
         var kernel = service.CreateKernel(Model);
         var discourse = new Discourse();
-        await Assert.ThrowsAsync<ArgumentNullException>(() => service.ChatCompletionAsStreamAsync(kernel, discourse, null));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => service.StreamChatMessageContentAsync(kernel, discourse, null));
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public class ChatServiceTests
 
         using (var cts = new CancellationTokenSource())
         {
-            var task = service.ChatCompletionAsStreamAsync(kernel, discourse, onStreamCompletion, cts.Token);
+            var task = service.StreamChatMessageContentAsync(kernel, discourse, onStreamCompletion, cts.Token);
 
             // Assert - Before cancellation
             Assert.False(task.IsCompleted);
@@ -87,7 +87,7 @@ public class ChatServiceTests
         var service = new ChatService();
         var kernel = service.CreateKernel(Model);
         var discourse = new Discourse();
-        discourse.ChatMessages.Add(ChatMessage.New(ChatRole.User, "Hello"));
+        discourse.AddChatMessage(ChatRole.User, "Hello");
         bool onStreamCompletionCalled = false;
 
         Func<string, Task> onStreamCompletion = async message =>
@@ -96,12 +96,10 @@ public class ChatServiceTests
             await Task.CompletedTask;
         };
 
-        var result = await service.ChatCompletionAsStreamAsync(kernel, discourse, onStreamCompletion);
+        await service.StreamChatMessageContentAsync(kernel, discourse, onStreamCompletion);
 
   
         Assert.True(onStreamCompletionCalled);
-
-        Assert.NotNull(result);
     }
 
 }

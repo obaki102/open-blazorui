@@ -8,8 +8,8 @@ public class Discourse
     public Guid? Id { get; set; }
     public string Model { get; set; } = default!;
     public List<ChatMessage> ChatMessages { get;  set; } = [];
-    public void AddChat(ChatMessage chat) =>
-        ChatMessages.Add(chat);
+    public void AddChatMessage(ChatRole role, string content) =>
+        ChatMessages.Add(ChatMessage.New(role,content));
     
 }
 
@@ -43,7 +43,7 @@ public static class DiscourseExtensions
                         ? ChatRole.User
                         : ChatRole.Assistant;
 
-            discourse.AddChat(ChatMessage.New(role, chat.Content ?? string.Empty));
+            discourse.AddChatMessage(role, chat.Content ?? string.Empty);
         }
 
         return discourse;

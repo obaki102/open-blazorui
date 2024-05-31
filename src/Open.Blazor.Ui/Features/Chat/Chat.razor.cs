@@ -8,7 +8,7 @@ public partial class Chat : ComponentBase
 {
 
     //todo support history
-    private Kernel _kernel = default!; 
+    private Kernel _kernel = default!;
     private Discourse _discourse = new();
     private string _userMessage = string.Empty;
     private bool _isChatOngoing = false;
@@ -26,12 +26,12 @@ public partial class Chat : ComponentBase
         if (string.IsNullOrWhiteSpace(_userMessage)) return;
         _isChatOngoing = true;
 
-        _discourse.ChatMessages.Add(ChatMessage.New(ChatRole.User, _userMessage));
-        _discourse.ChatMessages.Add(ChatMessage.New(ChatRole.Assistant, string.Empty));
+        _discourse.AddChatMessage(ChatRole.User, _userMessage);
+        _discourse.AddChatMessage(ChatRole.Assistant, string.Empty);
         _userMessage = string.Empty;
 
         StateHasChanged();
-        _discourse = await ChatService.ChatCompletionAsStreamAsync(_kernel, _discourse, OnStreamCompletion);
+        await ChatService.StreamChatMessageContentAsync(_kernel, _discourse, OnStreamCompletion);
         _isChatOngoing = false;
     }
 

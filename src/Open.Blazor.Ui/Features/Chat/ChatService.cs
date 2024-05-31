@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using System.Text;
 
 namespace Open.Blazor.Ui.Features.Chat;
 
@@ -26,7 +25,7 @@ internal sealed class ChatService
 
 
 
-    public async Task<Discourse> ChatCompletionAsStreamAsync(Kernel kernel,
+    public async Task StreamChatMessageContentAsync(Kernel kernel,
         Discourse discourse,
         Func<string, Task> onStreamCompletion,
         CancellationToken cancellationToken = default)
@@ -44,7 +43,6 @@ internal sealed class ChatService
             Temperature = 0.1,
         };
 
-        var fullMessage = new StringBuilder();
         var history = discourse.ToChatHistory();
 
         await foreach (var completionResult in chatCompletion.GetStreamingChatMessageContentsAsync(history,
@@ -52,17 +50,12 @@ internal sealed class ChatService
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                return discourse;
+                return ;
             }
        
-
-            fullMessage.Append(completionResult.Content);
             await onStreamCompletion.Invoke(completionResult.Content ?? string.Empty);
 
         }
-
-        history.AddAssistantMessage(fullMessage.ToString());    
-        return history.ToDiscourse();
     }
 }
 
