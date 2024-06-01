@@ -7,7 +7,6 @@ namespace Open.Blazor.Ui.Features.Shared
 {
     internal sealed class OllamaService
     {
-        private const string API_TAGS = "api/tags";
         private readonly HttpClient _httpClient;
 
         public OllamaService(HttpClient httpClient) =>
@@ -26,7 +25,7 @@ namespace Open.Blazor.Ui.Features.Shared
             try
             {
                 _httpClient.BaseAddress = new Uri(baseUrl);
-                var response = await _httpClient.GetAsync(API_TAGS);
+                var response = await _httpClient.GetAsync("api/tags");
                 response.EnsureSuccessStatusCode();
 
                 var responseBody = await response.Content.ReadAsStreamAsync();
@@ -39,11 +38,9 @@ namespace Open.Blazor.Ui.Features.Shared
             }
             catch (HttpRequestException ex)
             {
-                return Result.Failure<Ollama>(Error.Validation(ex.Message));
+                return Result.Failure<Ollama>(Error.Failure(ex.Message));
             }
         }
-
-      
 
     }
 

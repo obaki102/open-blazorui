@@ -4,10 +4,9 @@ using Microsoft.SemanticKernel;
 using Open.Blazor.Ui.Features.Shared;
 using Open.Blazor.Ui.Features.Shared.Models;
 
-
 namespace Open.Blazor.Ui.Features.Chat;
 
-public partial class Chat : ComponentBase
+public partial class Chat : ComponentBase, IDisposable
 {
 
     //todo support history
@@ -18,7 +17,7 @@ public partial class Chat : ComponentBase
     private bool _isOllamaUp = false;
     private Ollama? _activeOllamaModels = default!;
     private OllamaModel _selectedModel = default!;
-
+    private CancellationTokenSource _cancellationTokenSource = default!;
     [Inject]
     ChatService ChatService { get; set; } = default!;
 
@@ -31,8 +30,7 @@ public partial class Chat : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         var result = await OllamaService.GetListOfLocalModelsAsync();
-        _isOllamaUp = result.IsSuccess;
-        if (_isOllamaUp)
+        if (result.IsSuccess)
         {
             _activeOllamaModels = result.IsSuccess ? result.Value : default!;
 
@@ -40,6 +38,7 @@ public partial class Chat : ComponentBase
             {
                 var defaultModel = _activeOllamaModels.Models.First();
                 _kernel = ChatService.CreateKernel(defaultModel.Name);
+                _cancellationTokenSource = new();
             }
             else
             {
@@ -48,34 +47,45 @@ public partial class Chat : ComponentBase
             }
 
         }
-
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
+        else
         {
-            if (!_isOllamaUp)
-            {
-                await MessageService.ShowMessageBarAsync("Ollama service is down.",
-              MessageIntent.Error, @AppSection.MESSAGES_TOP);
-            }
+            await MessageService.ShowMessageBarAsync("Ollama service is down.",
+            MessageIntent.Error, @AppSection.MESSAGES_TOP);
         }
+
     }
+
 
     private async Task SendMessage()
     {
-        if (string.IsNullOrWhiteSpace(_userMessage)) return;
+        try
+        {
+            if (string.IsNullOrWhiteSpace(_userMessage)) return;
 
-        _isChatOngoing = true;
+            _isChatOngoing = true;
 
-        _discourse.AddChatMessage(ChatRole.User, _userMessage);
-        _discourse.AddChatMessage(ChatRole.Assistant, string.Empty);
-        _userMessage = string.Empty;
+            _discourse.AddChatMessage(ChatRole.User, _userMessage);
+            _discourse.AddChatMessage(ChatRole.Assistant, string.Empty);
 
-        await ChatService.StreamChatMessageContentAsync(_kernel, _discourse, OnStreamCompletion);
+            _userMessage = string.Empty;
 
-        _isChatOngoing = false;
+
+            await ScrollToBottom();
+            await ChatService.StreamChatMessageContentAsync(_kernel, _discourse, OnStreamCompletion, _cancellationTokenSource.Token);
+
+        }
+        finally
+        {
+            if (!_cancellationTokenSource.TryReset())
+            {
+                //clean-up the old cts and create a new one if the old one was already cancelled
+                _cancellationTokenSource.Dispose();
+                _cancellationTokenSource = new();
+            }
+
+            _isChatOngoing = false;
+
+        }
     }
 
 
@@ -84,7 +94,6 @@ public partial class Chat : ComponentBase
     {
         _discourse.ChatMessages.Last().Content += updatedContent;
         await ScrollToBottom();
-        StateHasChanged();
 
     }
 
@@ -95,4 +104,11 @@ public partial class Chat : ComponentBase
 
     }
 
+    private async Task StopChat() =>
+        await _cancellationTokenSource.CancelAsync();
+
+    public void Dispose()
+    {
+        _cancellationTokenSource.Dispose();
+    }
 }

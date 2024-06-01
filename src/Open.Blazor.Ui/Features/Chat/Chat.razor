@@ -4,7 +4,7 @@
 @using System.Text
 @using Open.Blazor.Ui.Features.Shared.Models
 @inject IJSRuntime JsRuntime
-@if (_isOllamaUp && _discourse is not null && _activeOllamaModels is not null)
+@if (_discourse is not null && _activeOllamaModels is not null)
 {
     <FluentStack Orientation="Orientation.Horizontal"
                  HorizontalAlignment="HorizontalAlignment.Center"
@@ -36,8 +36,19 @@
                  HorizontalAlignment="HorizontalAlignment.Center"
                  VerticalAlignment="VerticalAlignment.Bottom">
         <FluentTextArea @bind-Value=_userMessage style="width:700px;margin-top:20px" Placeholder="Let's chat"></FluentTextArea>
-        <FluentButton IconStart="@(new Icons.Regular.Size16.Send())"
-                      Appearance="Appearance.Accent" OnClick="SendMessage" Disabled="_isChatOngoing" />
+
+        @if (!_isChatOngoing)
+        {
+            <FluentButton IconStart="@(new Icons.Filled.Size16.Send())" 
+                          Appearance="Appearance.Stealth" OnClick="SendMessage" />
+        }
+        else
+        {
+            <FluentButton IconStart="@(new Icons.Filled.Size16.Stop())"
+                          Appearance="Appearance.Stealth" OnClick="StopChat" />
+        }
+
+
     </FluentStack>
 }
 @code {
@@ -46,5 +57,6 @@
     private async Task ScrollToBottom()
     {
         await JsRuntime.InvokeVoidAsync("ScrollToBottom", "chatWindow");
+        StateHasChanged();
     }
 }
