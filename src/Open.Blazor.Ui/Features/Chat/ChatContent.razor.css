@@ -49,3 +49,20 @@
 ::deep li {
     margin-bottom: 5px;
 }
+
+::deep .card-container {
+    display: flex;
+    justify-content: flex-end; 
+}
+
+::deep .card {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    box-sizing: border-box;
+    width: fit-content;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: calc(2 / 3 * 700px);
+    background: #212121;
+}

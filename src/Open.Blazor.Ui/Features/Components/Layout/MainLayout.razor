@@ -2,7 +2,7 @@
 @inject IMessageService MessageService
 @inject IDialogService DialogService
 
-<FluentToastProvider Position="ToastPosition.TopCenter" />
+<FluentToastProvider Position="ToastPosition.TopCenter" Timeout="10_000"/>
 <FluentDialogProvider />
 <FluentTooltipProvider />
 <FluentDesignTheme OnLoaded="@OnLoaded" StorageName="theme" />

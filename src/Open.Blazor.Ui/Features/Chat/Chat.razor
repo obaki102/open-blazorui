@@ -7,8 +7,7 @@
 @if (_discourse is not null && _activeOllamaModels is not null)
 {
     <FluentStack Orientation="Orientation.Horizontal"
-                 HorizontalAlignment="HorizontalAlignment.Center"
-                 VerticalAlignment="VerticalAlignment.Bottom">
+                 HorizontalAlignment="HorizontalAlignment.Start">
         <FluentSelect TOption="OllamaModel"
                       Label="Select a model"
                       Items="@_activeOllamaModels.Models"
@@ -22,7 +21,7 @@
                  HorizontalAlignment="HorizontalAlignment.Center"
                  VerticalAlignment="VerticalAlignment.Top"
                  VerticalGap="20"
-                 Style="height: 85%;margin:10px;overflow-y:auto;padding:10px">
+                 Style="height:85%;margin:10px;overflow-y:auto;padding:10px">
 
 
         @foreach (var message in _discourse.ChatMessages)
@@ -51,12 +50,4 @@
 
     </FluentStack>
 }
-@code {
 
-
-    private async Task ScrollToBottom()
-    {
-        await JsRuntime.InvokeVoidAsync("ScrollToBottom", "chatWindow");
-        StateHasChanged();
-    }
-}

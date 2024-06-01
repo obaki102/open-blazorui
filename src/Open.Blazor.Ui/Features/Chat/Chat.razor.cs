@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Microsoft.SemanticKernel;
 using Open.Blazor.Ui.Features.Shared;
 using Open.Blazor.Ui.Features.Shared.Models;
@@ -25,33 +26,29 @@ public partial class Chat : ComponentBase, IDisposable
     OllamaService OllamaService { get; set; } = default!;
 
     [Inject]
-    public required IMessageService MessageService { get; set; }
+    public required IToastService ToastService { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         var result = await OllamaService.GetListOfLocalModelsAsync();
-        if (result.IsSuccess)
-        {
-            _activeOllamaModels = result.IsSuccess ? result.Value : default!;
 
-            if (_activeOllamaModels is not null && _activeOllamaModels.Models.Count > 0)
-            {
-                var defaultModel = _activeOllamaModels.Models.First();
-                _kernel = ChatService.CreateKernel(defaultModel.Name);
-                _cancellationTokenSource = new();
-            }
-            else
-            {
-                await MessageService.ShowMessageBarAsync("No models found",
-             MessageIntent.Error, @AppSection.MESSAGES_TOP);
-            }
-
-        }
-        else
+        if (!result.IsSuccess)
         {
-            await MessageService.ShowMessageBarAsync("Ollama service is down.",
-            MessageIntent.Error, @AppSection.MESSAGES_TOP);
+            ShowError("Ollama service is down.");
+            return;
         }
+
+        _activeOllamaModels = result.Value ?? default!;
+
+        if (_activeOllamaModels is null || _activeOllamaModels.Models.Count == 0)
+        {
+            ShowError("No models found");
+            return;
+        }
+
+        var defaultModel = _activeOllamaModels.Models.First();
+        _kernel = ChatService.CreateKernel(defaultModel.Name);
+        _cancellationTokenSource = new();
 
     }
 
@@ -61,18 +58,17 @@ public partial class Chat : ComponentBase, IDisposable
         try
         {
             if (string.IsNullOrWhiteSpace(_userMessage)) return;
-
             _isChatOngoing = true;
-
             _discourse.AddChatMessage(ChatRole.User, _userMessage);
             _discourse.AddChatMessage(ChatRole.Assistant, string.Empty);
-
             _userMessage = string.Empty;
 
-
-            await ScrollToBottom();
             await ChatService.StreamChatMessageContentAsync(_kernel, _discourse, OnStreamCompletion, _cancellationTokenSource.Token);
-
+        }
+        catch (Exception ex)
+        {
+            //todo implement logger
+            ShowError(ex.Message);
         }
         finally
         {
@@ -97,18 +93,28 @@ public partial class Chat : ComponentBase, IDisposable
 
     }
 
+    private void ShowError(string errorMessage) =>
+         ToastService.ShowError(errorMessage);
+
+
     private void HandleSelectedOptionChanged(OllamaModel selectedModelChanged)
     {
         _selectedModel = selectedModelChanged;
         _kernel = ChatService.CreateKernel(_selectedModel.Name);
-
     }
 
     private async Task StopChat() =>
         await _cancellationTokenSource.CancelAsync();
 
+    private async Task ScrollToBottom()
+    {
+        await JsRuntime.InvokeVoidAsync("ScrollToBottom", "chatWindow");
+        StateHasChanged();
+    }
+
     public void Dispose()
     {
-        _cancellationTokenSource.Dispose();
+        if (_cancellationTokenSource is not null)
+            _cancellationTokenSource.Dispose();
     }
 }
