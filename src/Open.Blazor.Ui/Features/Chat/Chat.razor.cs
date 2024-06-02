@@ -28,6 +28,9 @@ public partial class Chat : ComponentBase, IDisposable
     [Inject]
     public required IToastService ToastService { get; set; }
 
+    [Inject]
+    public required IJSRuntime JsRuntime { get; set; }
+ 
     protected override async Task OnInitializedAsync()
     {
         var result = await OllamaService.GetListOfLocalModelsAsync();
@@ -48,7 +51,8 @@ public partial class Chat : ComponentBase, IDisposable
 
         var defaultModel = _activeOllamaModels.Models.First();
         _kernel = ChatService.CreateKernel(defaultModel.Name);
-        _cancellationTokenSource = new();
+        _selectedModel = defaultModel;
+      _cancellationTokenSource = new();
 
     }
 
@@ -66,10 +70,11 @@ public partial class Chat : ComponentBase, IDisposable
         {
             if (string.IsNullOrWhiteSpace(_userMessage)) return;
             _isChatOngoing = true;
-            _discourse.AddChatMessage(ChatRole.User, _userMessage);
-            _discourse.AddChatMessage(ChatRole.Assistant, string.Empty);
+            _discourse.AddChatMessage(ChatRole.User, _userMessage, _selectedModel.Name);
+            _discourse.AddChatMessage(ChatRole.Assistant, string.Empty, _selectedModel.Name);
             _userMessage = string.Empty;
             await ChatService.StreamChatMessageContentAsync(_kernel, _discourse, OnStreamCompletion, _cancellationTokenSource.Token);
+            _discourse.ChatMessages.Last().IsDoneStreaming = true;
         }
         catch (Exception ex)
         {

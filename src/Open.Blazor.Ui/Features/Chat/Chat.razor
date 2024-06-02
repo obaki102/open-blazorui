@@ -3,31 +3,28 @@
 @using Microsoft.SemanticKernel.Connectors.OpenAI
 @using System.Text
 @using Open.Blazor.Ui.Features.Shared.Models
-@inject IJSRuntime JsRuntime
+
 @if (_discourse is not null && _activeOllamaModels is not null)
 {
-    
-    <FluentStack Orientation="Orientation.Horizontal"
-                 HorizontalAlignment="HorizontalAlignment.Start">
+    <div>
         <FluentSelect TOption="OllamaModel"
-                      Label="Select a model"
                       Items="@_activeOllamaModels.Models"
                       Id="listOfActiveModels"
                       Width="200px"
                       OptionText="@(p => p.Name)"
                       SelectedOption="_selectedModel"
                       SelectedOptionChanged="HandleSelectedOptionChanged" />
-    </FluentStack>
+    </div>
     <div id="chat-window">
 
         @foreach (var message in _discourse.ChatMessages)
         {
-            <ChatContent Message="message" />
+            <ChatContent Message="message" ToastService="ToastService" JsRuntime="JsRuntime" />
         }
 
     </div>
     <div class="chat-box-container">
-        <FluentTextArea @bind-Value=_userMessage Style="width:700px" Placeholder="Let's chat"></FluentTextArea>
+        <FluentTextArea @bind-Value=_userMessage Style="width:640px" Placeholder="Let's chat"></FluentTextArea>
 
         @if (!_isChatOngoing)
         {
@@ -42,6 +39,5 @@
 
 
     </div>
-
 }
 
