@@ -52,6 +52,13 @@ public partial class Chat : ComponentBase, IDisposable
 
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(_isChatOngoing)
+            await ScrollToBottom();
+    }
+      
+
 
     private async Task SendMessage()
     {
@@ -62,7 +69,6 @@ public partial class Chat : ComponentBase, IDisposable
             _discourse.AddChatMessage(ChatRole.User, _userMessage);
             _discourse.AddChatMessage(ChatRole.Assistant, string.Empty);
             _userMessage = string.Empty;
-
             await ChatService.StreamChatMessageContentAsync(_kernel, _discourse, OnStreamCompletion, _cancellationTokenSource.Token);
         }
         catch (Exception ex)
@@ -74,7 +80,7 @@ public partial class Chat : ComponentBase, IDisposable
         {
             if (!_cancellationTokenSource.TryReset())
             {
-                //clean-up the old cts and create a new one if the old one was already cancelled
+                //if cancelled clean-up the old cts and create a new one 
                 _cancellationTokenSource.Dispose();
                 _cancellationTokenSource = new();
             }
@@ -86,11 +92,10 @@ public partial class Chat : ComponentBase, IDisposable
 
 
     //See if this can be opimize further
-    private async Task OnStreamCompletion(string updatedContent)
+    private Task OnStreamCompletion(string updatedContent)
     {
         _discourse.ChatMessages.Last().Content += updatedContent;
-        await ScrollToBottom();
-
+        return Task.CompletedTask;
     }
 
     private void ShowError(string errorMessage) =>

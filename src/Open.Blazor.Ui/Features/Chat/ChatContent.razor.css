@@ -12,6 +12,7 @@
     border-radius: 5px;
     overflow: auto;
     color: #f8f8f2;
+    max-width: 700px;
 }
 
 ::deep code {
@@ -19,6 +20,7 @@
     padding: 2px 4px;
     border-radius: 3px;
     color: #f8f8f2;
+    max-width: 700px;
 }
 
 ::deep strong {
@@ -52,7 +54,7 @@
 
 ::deep .card-container {
     display: flex;
-    justify-content: flex-end; 
+    justify-content: flex-end;
 }
 
 ::deep .card {
@@ -65,4 +67,27 @@
     overflow-wrap: break-word;
     max-width: calc(2 / 3 * 700px);
     background: #212121;
+}
+
+
+.chat-content {
+    width: 100%;
+    max-width: 700px;
+    min-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 700px) {
+    .container {
+        width: auto;
+    }
+}
+
+
+@media (max-width: 400px) {
+    .container {
+        min-width: auto;
+    }
 }

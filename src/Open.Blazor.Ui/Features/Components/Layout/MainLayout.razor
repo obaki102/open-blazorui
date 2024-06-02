@@ -2,22 +2,26 @@
 @inject IMessageService MessageService
 @inject IDialogService DialogService
 
-<FluentToastProvider Position="ToastPosition.TopCenter" Timeout="10_000"/>
+<FluentToastProvider Position="ToastPosition.TopCenter" Timeout="10_000" />
 <FluentDialogProvider />
 <FluentTooltipProvider />
 <FluentDesignTheme OnLoaded="@OnLoaded" StorageName="theme" />
 <CascadingValue Value="@_themeMode">
     <FluentLayout>
-        <FluentHeader Style="background-color: var(--neutral-layer-4) !important;">
-            <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Start"
-                         VerticalAlignment="VerticalAlignment.Center" Horizontal Gap="5">
-                <FluentLabel Typo="Typography.Subject" Weight="FontWeight.Bold">  open-blazorui </FluentLabel>
-                <FluentSpacer />
-                <FluentButton OnClick="OpenSettingsAsync" Title="Settings" Appearance="Appearance.Stealth">
-                    <FluentIcon Value="@(new Icons.Filled.Size20.Settings())" OnClick="OpenSettingsAsync" Color="Color.Neutral" />
-                </FluentButton>
-            </FluentStack>
-        </FluentHeader>
+        <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Start"
+                     VerticalAlignment="VerticalAlignment.Center" Horizontal Gap="5">
+            <label id="myPopoverButtonH" class="label-header" @onclick="() => _visibleL = !_visibleL">  open-blazorui </label>
+            <FluentPopover Style="width: 300px;" AnchorId="myPopoverButtonH" @bind-Open="_visibleL" AutoFocus="false">
+                <Body>
+                    Callout Body (no header)
+                </Body>
+                <Footer>Callout Footer</Footer>
+            </FluentPopover>
+            <FluentSpacer />
+            <FluentButton OnClick="OpenSettingsAsync" Title="Settings" Appearance="Appearance.Stealth" Style="margin-top:10px;margin-right:30px">
+                <FluentIcon Value="@(new Icons.Filled.Size20.Settings())" OnClick="OpenSettingsAsync" Color="Color.Neutral" />
+            </FluentButton>
+        </FluentStack>
         <FluentStack Class="main" Orientation="Orientation.Horizontal" Width="100%">
             @* <NavMenu /> *@
             <FluentBodyContent Class="body-content">
@@ -38,6 +42,7 @@
 </CascadingValue>
 @code
 {
+    bool _visibleL, _visibleR, _visibleM;
     private IDialogReference? _dialog;
     private DesignThemeModes _themeMode { get; set; }
     private void OnLoaded(LoadedEventArgs e) =>

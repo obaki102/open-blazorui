@@ -189,3 +189,24 @@ code {
         right: unset;
     }
 }
+::-webkit-scrollbar {
+    width: 12px; 
+}
+
+
+::-webkit-scrollbar-track {
+    background: #333333;
+    border-radius: 10px;
+}
+
+
+::-webkit-scrollbar-thumb {
+    background: #1A1A1A; 
+    border-radius: 10px; 
+    height: 30px; 
+}
+
+ 
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }

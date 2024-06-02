@@ -1,7 +1,7 @@
 ﻿@using Markdig
 @if (Message is not null)
 {
-    <div style="width:700px;text-align:@_alignment">
+    <div class="chat-content" style="text-align:@_alignment;">
         @if (Message.Role == ChatRole.User)
         {
             <div class="card-container">
@@ -18,7 +18,7 @@
 
             @if (string.IsNullOrEmpty(Message.Content))
             {
-                <FluentProgress Width="20px" Style="margin-left:10px"></FluentProgress>
+                <FluentProgress Width="25px" Style="margin-left:10px"></FluentProgress>
             }
             else
             {
