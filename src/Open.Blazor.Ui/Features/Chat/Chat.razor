@@ -6,6 +6,7 @@
 @inject IJSRuntime JsRuntime
 @if (_discourse is not null && _activeOllamaModels is not null)
 {
+    
     <FluentStack Orientation="Orientation.Horizontal"
                  HorizontalAlignment="HorizontalAlignment.Start">
         <FluentSelect TOption="OllamaModel"
@@ -17,37 +18,30 @@
                       SelectedOption="_selectedModel"
                       SelectedOptionChanged="HandleSelectedOptionChanged" />
     </FluentStack>
-    <FluentStack Id="chatWindow" Orientation="Orientation.Vertical"
-                 HorizontalAlignment="HorizontalAlignment.Center"
-                 VerticalAlignment="VerticalAlignment.Top"
-                 VerticalGap="20"
-                 Style="height:85%;margin:10px;overflow-y:auto;padding:10px">
-
+    <div id="chat-window">
 
         @foreach (var message in _discourse.ChatMessages)
         {
             <ChatContent Message="message" />
         }
 
-    </FluentStack>
-
-    <FluentStack Orientation="Orientation.Horizontal"
-                 HorizontalAlignment="HorizontalAlignment.Center"
-                 VerticalAlignment="VerticalAlignment.Bottom">
-        <FluentTextArea @bind-Value=_userMessage style="width:700px;margin-top:20px" Placeholder="Let's chat"></FluentTextArea>
+    </div>
+    <div class="chat-box-container">
+        <FluentTextArea @bind-Value=_userMessage Style="width:700px" Placeholder="Let's chat"></FluentTextArea>
 
         @if (!_isChatOngoing)
         {
-            <FluentButton IconStart="@(new Icons.Filled.Size16.Send())" 
+            <FluentButton IconStart="@(new Icons.Filled.Size16.Send())" Style="margin-left:5px"
                           Appearance="Appearance.Stealth" OnClick="SendMessage" />
         }
         else
         {
-            <FluentButton IconStart="@(new Icons.Filled.Size16.Stop())"
+            <FluentButton IconStart="@(new Icons.Filled.Size16.Stop())" Style="margin-left:5px"
                           Appearance="Appearance.Stealth" OnClick="StopChat" />
         }
 
 
-    </FluentStack>
+    </div>
+
 }
 

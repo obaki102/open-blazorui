@@ -113,7 +113,7 @@ public partial class Chat : ComponentBase, IDisposable
 
     private async Task ScrollToBottom()
     {
-        await JsRuntime.InvokeVoidAsync("ScrollToBottom", "chatWindow");
+        await JsRuntime.InvokeVoidAsync("ScrollToBottom", "chat-window");
         StateHasChanged();
     }
 

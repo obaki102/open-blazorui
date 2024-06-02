@@ -2,7 +2,7 @@
     font-family: ui-sans-serif, -apple-system, system-ui, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif, Helvetica, "Apple Color Emoji", Arial, "Segoe UI Emoji", "Segoe UI Symbol";
     font-style: normal;
     font-weight: 600;
-    color: #A9A9A9;
+    color: #1B8CE3;
     font-size: 18px;
     line-height: 28px;
     margin-top: 10px;
@@ -11,8 +11,8 @@
 }
 
     .label-header:hover {
-        color: #26282B;
-        background-color: #f0f0f0; 
-        padding: 2px; 
-        border-radius: 5px; 
+        color: #59BEFC;
+        background-color: #f0f0f0;
+        padding: 2px;
+        border-radius: 5px;
     }

@@ -5,20 +5,25 @@
 <FluentToastProvider Position="ToastPosition.TopCenter" Timeout="10_000" />
 <FluentDialogProvider />
 <FluentTooltipProvider />
-<FluentDesignTheme OnLoaded="@OnLoaded" StorageName="theme" />
+<FluentDesignTheme OnLoaded="@OnLoaded" StorageName="theme" CustomColor="#FFFFFF" />
 <CascadingValue Value="@_themeMode">
     <FluentLayout>
         <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Start"
                      VerticalAlignment="VerticalAlignment.Center" Horizontal Gap="5">
-            <label id="myPopoverButtonH" class="label-header" @onclick="() => _visibleL = !_visibleL">  open-blazorui </label>
-            <FluentPopover Style="width: 300px;" AnchorId="myPopoverButtonH" @bind-Open="_visibleL" AutoFocus="false">
+            <FluentPopover Style="width: 300px;" AnchorId="header-label" @bind-Open="_visibleL" AutoFocus="false">
                 <Body>
-                    Callout Body (no header)
+                  What to put?
                 </Body>
-                <Footer>Callout Footer</Footer>
+                <Footer>What to put 2?</Footer>
             </FluentPopover>
+            <FluentButton Id="header-label" Appearance="Appearance.Stealth" Style="margin-top:10px;margin-left:20px" OnClick="() => _visibleL = !_visibleL">
+                <FluentLabel  Typo="Typography.Header" 
+                             Color="Color.Neutral" Weight="FontWeight.Bold"> open-blazorui</FluentLabel>
+            </FluentButton>
+
             <FluentSpacer />
-            <FluentButton OnClick="OpenSettingsAsync" Title="Settings" Appearance="Appearance.Stealth" Style="margin-top:10px;margin-right:30px">
+
+            <FluentButton OnClick="OpenSettingsAsync" Title="Settings" Appearance="Appearance.Stealth" Style="margin-top:10px;margin-right:20px">
                 <FluentIcon Value="@(new Icons.Filled.Size20.Settings())" OnClick="OpenSettingsAsync" Color="Color.Neutral" />
             </FluentButton>
         </FluentStack>
