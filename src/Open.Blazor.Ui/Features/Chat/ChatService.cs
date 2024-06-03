@@ -23,24 +23,42 @@ internal sealed class ChatService
     }
 
 
+    public async Task StreamChatMessageContentAsync(Kernel kernel,
+     Discourse discourse,
+     Func<string, Task> onStreamCompletion,
+     ChatSettings chatSettings,
+     CancellationToken cancellationToken = default)
+    {
+        var executionSettings = chatSettings.ToOpenAIPromptExecutionSettings();
+        await StreamChatMessageContentAsync(kernel, discourse, onStreamCompletion, executionSettings, cancellationToken);
+    }
 
     public async Task StreamChatMessageContentAsync(Kernel kernel,
         Discourse discourse,
         Func<string, Task> onStreamCompletion,
         CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(kernel);
-        ArgumentNullException.ThrowIfNull(discourse);
-        ArgumentNullException.ThrowIfNull(onStreamCompletion);
-
-        var chatCompletion = kernel.GetRequiredService<IChatCompletionService>();
-
-        //todo make it configurable
         var executionSettings = new OpenAIPromptExecutionSettings
         {
             MaxTokens = 2000,
             Temperature = 0.1,
         };
+
+        await StreamChatMessageContentAsync(kernel, discourse, onStreamCompletion, executionSettings, cancellationToken);
+    }
+
+    private async Task StreamChatMessageContentAsync(Kernel kernel,
+    Discourse discourse,
+    Func<string, Task> onStreamCompletion,
+    OpenAIPromptExecutionSettings executionSettings,
+    CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(kernel);
+        ArgumentNullException.ThrowIfNull(discourse);
+        ArgumentNullException.ThrowIfNull(onStreamCompletion);
+        ArgumentNullException.ThrowIfNull(executionSettings);
+
+        var chatCompletion = kernel.GetRequiredService<IChatCompletionService>();
 
         var history = discourse.ToChatHistory();
 
@@ -49,9 +67,9 @@ internal sealed class ChatService
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                return ;
+                return;
             }
-       
+
             await onStreamCompletion.Invoke(completionResult.Content ?? string.Empty);
 
         }
