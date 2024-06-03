@@ -24,42 +24,19 @@ internal sealed class ChatService
 
 
     public async Task StreamChatMessageContentAsync(Kernel kernel,
-     Discourse discourse,
-     Func<string, Task> onStreamCompletion,
-     ChatSettings chatSettings,
-     CancellationToken cancellationToken = default)
-    {
-        var executionSettings = chatSettings.ToOpenAIPromptExecutionSettings();
-        await StreamChatMessageContentAsync(kernel, discourse, onStreamCompletion, executionSettings, cancellationToken);
-    }
-
-    public async Task StreamChatMessageContentAsync(Kernel kernel,
-        Discourse discourse,
-        Func<string, Task> onStreamCompletion,
-        CancellationToken cancellationToken = default)
-    {
-        var executionSettings = new OpenAIPromptExecutionSettings
-        {
-            MaxTokens = 2000,
-            Temperature = 0.1,
-        };
-
-        await StreamChatMessageContentAsync(kernel, discourse, onStreamCompletion, executionSettings, cancellationToken);
-    }
-
-    private async Task StreamChatMessageContentAsync(Kernel kernel,
     Discourse discourse,
     Func<string, Task> onStreamCompletion,
-    OpenAIPromptExecutionSettings executionSettings,
+    ChatSettings chatSettings,
     CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(kernel);
         ArgumentNullException.ThrowIfNull(discourse);
         ArgumentNullException.ThrowIfNull(onStreamCompletion);
-        ArgumentNullException.ThrowIfNull(executionSettings);
+        ArgumentNullException.ThrowIfNull(chatSettings);
 
         var chatCompletion = kernel.GetRequiredService<IChatCompletionService>();
 
+        var executionSettings = chatSettings.ToOpenAIPromptExecutionSettings();
         var history = discourse.ToChatHistory();
 
         await foreach (var completionResult in chatCompletion.GetStreamingChatMessageContentsAsync(history,

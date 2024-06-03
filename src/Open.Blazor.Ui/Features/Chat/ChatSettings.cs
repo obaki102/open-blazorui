@@ -9,7 +9,7 @@ public class ChatSettings
     public double TopP { get; set; } = 1;
     public double PresencePenalty { get; set; }
     public double FrequencyPenalty { get; set; }
-    public int? MaxTokens { get; set; }
+    public int? MaxTokens { get; set; } = 2000;
     public IList<string>? StopSequences { get; set; }
     public string? ChatSystemPrompt { get; set; }
 

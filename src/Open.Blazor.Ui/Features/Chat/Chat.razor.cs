@@ -19,6 +19,7 @@ public partial class Chat : ComponentBase, IDisposable
     private Ollama? _activeOllamaModels = default!;
     private OllamaModel _selectedModel = default!;
     private CancellationTokenSource _cancellationTokenSource = default!;
+    private ChatSettings _chatSettings = new();
     [Inject]
     ChatService ChatService { get; set; } = default!;
 
@@ -73,7 +74,7 @@ public partial class Chat : ComponentBase, IDisposable
             _discourse.AddChatMessage(ChatRole.User, _userMessage, _selectedModel.Name);
             _discourse.AddChatMessage(ChatRole.Assistant, string.Empty, _selectedModel.Name);
             _userMessage = string.Empty;
-            await ChatService.StreamChatMessageContentAsync(_kernel, _discourse, OnStreamCompletion, _cancellationTokenSource.Token);
+            await ChatService.StreamChatMessageContentAsync(_kernel, _discourse, OnStreamCompletion, _chatSettings, _cancellationTokenSource.Token);
             _discourse.ChatMessages.Last().IsDoneStreaming = true;
         }
         catch (Exception ex)

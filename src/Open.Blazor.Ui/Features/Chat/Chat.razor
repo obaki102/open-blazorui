@@ -6,15 +6,30 @@
 
 @if (_discourse is not null && _activeOllamaModels is not null)
 {
-    <div>
-        <FluentSelect TOption="OllamaModel"
-                      Items="@_activeOllamaModels.Models"
-                      Id="listOfActiveModels"
-                      Width="200px"
-                      OptionText="@(p => p.Name)"
-                      SelectedOption="_selectedModel"
-                      SelectedOptionChanged="HandleSelectedOptionChanged" />
+    <div class="settings">
+
+        <FluentCard>
+            <FluentLabel Style="margin-bottom:10px" Typo="Typography.Header"> Chat Settings </FluentLabel>
+            <FluentSelect TOption="OllamaModel"
+                          Label="Model"
+                          Items="@_activeOllamaModels.Models"
+                          Id="listOfActiveModels"
+                          Width="200px"
+                          Style="margin:5px"
+                          OptionText="@(p => p.Name)"
+                          SelectedOption="_selectedModel"
+                          SelectedOptionChanged="HandleSelectedOptionChanged" />
+            <FluentSlider Label="Temperature" Min="0" Max="2" Step=".1" Style="margin:5px" />
+            <FluentSlider Label="Max Tokens" Min="0" Max="4000" Step="10" Style="margin:5px" />
+            <FluentSlider Label="Top P" Min="0" Max="2" Step=".1" Style="margin:5px" />
+            <FluentSlider Label="Presence Penalty" Min="0" Max="2" Step=".1" Style="margin:5px" />
+            <FluentSlider Label="Frequency Penalty" Min="0" Max="2" Step=".1" Style="margin:5px" />
+            <FluentTextArea Label="System Prompt" Cols="60"></FluentTextArea>
+
+
+        </FluentCard>
     </div>
+
     <div id="chat-window">
 
         @foreach (var message in _discourse.ChatMessages)
