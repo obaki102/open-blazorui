@@ -71,7 +71,6 @@ public partial class Chat : ComponentBase, IDisposable
     }
       
 
-
     private async Task SendMessage()
     {
         try
@@ -105,7 +104,7 @@ public partial class Chat : ComponentBase, IDisposable
     }
 
 
-    //See if this can be opimize further
+    //See if this can be optimize further
     private Task OnStreamCompletion(string updatedContent)
     {
         _discourse.ChatMessages.Last().Content += updatedContent;
