@@ -59,16 +59,6 @@ namespace Open.Blazor.Tests.ChatServiceTests
         }
 
         [Fact]
-        public async Task StreamChatMessageContentAsync_WithChatSettings_ShouldThrowArgumentNullException_WhenChatSettingsIsNull()
-        {
-            var service = new ChatService();
-            var kernel = service.CreateKernel(Model);
-            var discourse = new Discourse();
-            Func<string, Task> onStreamCompletion = async _ => await Task.CompletedTask;
-            await Assert.ThrowsAsync<ArgumentNullException>(() => service.StreamChatMessageContentAsync(kernel, discourse, onStreamCompletion, null));
-        }
-
-        [Fact]
         public async Task StreamChatMessageContentAsync_WithChatSettings_ShouldReturnDiscourse_WhenCancellationIsRequested()
         {
             // Not an actual unit test, the kernel is called directly so ollama must be up at this point.

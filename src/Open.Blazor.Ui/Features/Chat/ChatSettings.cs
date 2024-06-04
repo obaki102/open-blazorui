@@ -3,16 +3,45 @@ using Microsoft.SemanticKernel.Connectors.OpenAI;
 
 namespace Open.Blazor.Ui.Features.Chat;
 
-public class ChatSettings
+public struct ChatSettings
 {
-    public double Temperature { get; set; } = 1;
-    public double TopP { get; set; } = 1;
+    public ChatSettings(
+        double temperature,
+        double topP,
+        double presencePenalty,
+        double frequencyPenalty,
+        int? maxTokens,
+        IList<string>? stopSequences,
+        string? chatSystemPrompt)
+    {
+        Temperature = temperature;
+        TopP = topP;
+        PresencePenalty = presencePenalty;
+        FrequencyPenalty = frequencyPenalty;
+        MaxTokens = maxTokens;
+        StopSequences = stopSequences;
+        ChatSystemPrompt = chatSystemPrompt;
+    }
+
+    public double Temperature { get; set; }
+    public double TopP { get; set; }
     public double PresencePenalty { get; set; }
     public double FrequencyPenalty { get; set; }
-    public int? MaxTokens { get; set; } = 2000;
+    public int? MaxTokens { get; set; }
     public IList<string>? StopSequences { get; set; }
     public string? ChatSystemPrompt { get; set; }
 
+    public static ChatSettings New(
+        double temperature,
+        double topP,
+        double presencePenalty,
+        double frequencyPenalty,
+        int? maxTokens,
+        IList<string>? stopSequences,
+        string? chatSystemPrompt)
+    {
+        return new ChatSettings(temperature, topP, presencePenalty, frequencyPenalty, maxTokens, stopSequences, chatSystemPrompt);
+    }
 }
 
 public static class ChatSettingsExtensions

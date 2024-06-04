@@ -19,12 +19,12 @@
                           OptionText="@(p => p.Name)"
                           SelectedOption="_selectedModel"
                           SelectedOptionChanged="HandleSelectedOptionChanged" />
-            <FluentSlider Label="Temperature" Min="0" Max="2" Step=".1" Style="margin:5px" />
-            <FluentSlider Label="Max Tokens" Min="0" Max="4000" Step="10" Style="margin:5px" />
-            <FluentSlider Label="Top P" Min="0" Max="2" Step=".1" Style="margin:5px" />
-            <FluentSlider Label="Presence Penalty" Min="0" Max="2" Step=".1" Style="margin:5px" />
-            <FluentSlider Label="Frequency Penalty" Min="0" Max="2" Step=".1" Style="margin:5px" />
-            <FluentTextArea Label="System Prompt" Cols="60"></FluentTextArea>
+            <FluentSlider Label="Temperature" @bind-Value="_temperature" Min="0" Max="2" Step=".1" Style="margin:5px" />
+            <FluentSlider Label="Max Tokens" @bind-Value="_maxTokens"  Min="0" Max="4000" Step="10" Style="margin:5px" />
+            <FluentSlider Label="Top P"  @bind-Value="_topP" Min="0" Max="2" Step=".1" Style="margin:5px" />
+            <FluentSlider Label="Presence Penalty" @bind-Value="_presencePenalty" Min="0" Max="2" Step=".1" Style="margin:5px" />
+            <FluentSlider Label="Frequency Penalty" @bind-Value="_frequencyPenalty" Min="0" Max="2" Step=".1" Style="margin:5px" />
+            <FluentTextArea Label="System Prompt"  @bind-Value="_chatSystemPrompt" Cols="80"></FluentTextArea>
 
 
         </FluentCard>

@@ -27,11 +27,12 @@
 .settings {
     display: block;
     margin-left:20px;
-    position: fixed; /* or absolute, depending on your needs */
+    position: fixed; 
     left: 0;
     top: 50px;
-    width: 300px; /* Adjust width as needed */
-    height: 100%; /* Optional: to make it full height */
+    width:300px;
+
+;
 }
 
 @media (max-width:1400px) {
