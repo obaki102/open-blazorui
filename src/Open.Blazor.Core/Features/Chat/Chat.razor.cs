@@ -38,14 +38,14 @@ public partial class Chat : ComponentBase, IDisposable
 
     [Inject]
     public required IJSRuntime JsRuntime { get; set; }
- 
+
     protected override async Task OnInitializedAsync()
     {
         var result = await OllamaService.GetListOfLocalModelsAsync();
 
         if (!result.IsSuccess)
         {
-            ShowError("Ollama service is down.");
+            ShowError("Ollama service is down. Please ensure Ollama is up and running.");
             return;
         }
 
