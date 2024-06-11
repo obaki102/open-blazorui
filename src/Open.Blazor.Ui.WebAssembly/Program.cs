@@ -12,7 +12,4 @@ builder.Services.AddFluentUIComponents();
 builder.Services.AddChatServiceAsScoped();
 builder.Services.AddOllamaServiceAsScoped();
 
-
-
-
 await builder.Build().RunAsync();

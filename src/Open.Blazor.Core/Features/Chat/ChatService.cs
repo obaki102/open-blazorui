@@ -5,6 +5,7 @@ using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Open.Blazor.Core.Features.Shared;
 
+
 namespace Open.Blazor.Core.Features.Chat;
 
 internal sealed class ChatService
@@ -13,13 +14,15 @@ internal sealed class ChatService
     {
         ArgumentNullException.ThrowIfNull(model);
 #pragma warning disable SKEXP0010
-        var kernel = Kernel.CreateBuilder()
-            .AddOpenAIChatCompletion(
-                model,
-                new Uri(Default.baseUrl),
-                apiKey: null)
-            .Build();
-        return kernel;
+
+        var kernelBuilder = Kernel.CreateBuilder()
+            .AddOpenAIChatCompletion( 
+                modelId: model,
+                endpoint: new Uri(Default.baseUrl),
+                apiKey: null,
+                httpClient: OperatingSystem.IsBrowser() ? new HttpClient() : null);
+
+        return kernelBuilder.Build();
     }
 
 
