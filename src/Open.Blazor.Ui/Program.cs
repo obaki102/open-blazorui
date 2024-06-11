@@ -1,8 +1,7 @@
 using Microsoft.FluentUI.AspNetCore.Components;
-using Open.Blazor.Ui.Features.Chat;
-using Open.Blazor.Ui.Features.Components;
-using Open.Blazor.Ui.Features.Shared;
-
+using Open.Blazor.Core.Features.Chat;
+using Open.Blazor.Core.Features.Shared;
+using Open.Blazor.Ui;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

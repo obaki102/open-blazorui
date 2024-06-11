@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Text.Json.Serialization;
 
-namespace Open.Blazor.Ui.Features.Shared.Models;
+namespace Open.Blazor.Core.Features.Shared.Models;
 
 /// <summary>
 /// https://github.com/jmorganca/ollama/blob/main/docs/api.md#list-local-models

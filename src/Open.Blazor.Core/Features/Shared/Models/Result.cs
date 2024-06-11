@@ -1,6 +1,6 @@
 ﻿using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Open.Blazor.Ui.Features.Shared.Models;
+namespace Open.Blazor.Core.Features.Shared.Models;
 
 public class Result
 {

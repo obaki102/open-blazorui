@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Open.Blazor.Ui\Open.Blazor.Ui.csproj" />
+    <ProjectReference Include="..\..\src\Open.Blazor.Core\Open.Blazor.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

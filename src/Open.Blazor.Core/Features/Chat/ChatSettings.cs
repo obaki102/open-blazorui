@@ -1,7 +1,7 @@
 ﻿
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 
-namespace Open.Blazor.Ui.Features.Chat;
+namespace Open.Blazor.Core.Features.Chat;
 
 public struct ChatSettings
 {

@@ -1,11 +1,11 @@
 ﻿
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.SemanticKernel.Connectors.OpenAI;
-using Open.Blazor.Ui.Features.Shared;
+using Open.Blazor.Core.Features.Shared;
 
-namespace Open.Blazor.Ui.Features.Chat;
+namespace Open.Blazor.Core.Features.Chat;
 
 internal sealed class ChatService
 {

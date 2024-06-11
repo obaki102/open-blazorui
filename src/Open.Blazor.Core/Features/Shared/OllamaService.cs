@@ -1,9 +1,10 @@
 ﻿
-using Open.Blazor.Ui.Features.Shared.Models;
+using Microsoft.Extensions.DependencyInjection;
+using Open.Blazor.Core.Features.Shared.Models;
 using System.Text.Json;
 
 
-namespace Open.Blazor.Ui.Features.Shared
+namespace Open.Blazor.Core.Features.Shared
 {
     internal sealed class OllamaService
     {

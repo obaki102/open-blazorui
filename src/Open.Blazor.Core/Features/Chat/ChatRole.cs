@@ -1,4 +1,4 @@
-﻿namespace Open.Blazor.Ui.Features.Chat;
+﻿namespace Open.Blazor.Core.Features.Chat;
 
 public enum ChatRole
 {

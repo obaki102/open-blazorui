@@ -1,4 +1,4 @@
-using Open.Blazor.Ui.Features.Chat;
+using Open.Blazor.Core.Features.Chat;
 
 namespace Open.Blazor.Tests.ChatServiceTests
 {

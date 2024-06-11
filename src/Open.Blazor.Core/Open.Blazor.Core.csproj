@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+
+	<ItemGroup>
+		<SupportedPlatform Include="browser" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.6" />
+		<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.*-* " />
+		<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.*-* " />
+		<PackageReference Include="Microsoft.SemanticKernel" Version="1.13.0" />
+		<PackageReference Include="Microsoft.SemanticKernel.Planners.Handlebars" Version="1.13.0-preview" />
+		<PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.13.0-alpha" />
+		<PackageReference Include="Markdig" Version="0.37.0" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="Open.Blazor.Tests" />
+
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <Folder Include="wwwroot\" />
+	</ItemGroup>
+
+</Project>

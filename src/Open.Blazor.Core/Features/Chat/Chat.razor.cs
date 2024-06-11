@@ -2,10 +2,10 @@
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Microsoft.SemanticKernel;
-using Open.Blazor.Ui.Features.Shared;
-using Open.Blazor.Ui.Features.Shared.Models;
+using Open.Blazor.Core.Features.Shared;
+using Open.Blazor.Core.Features.Shared.Models;
 
-namespace Open.Blazor.Ui.Features.Chat;
+namespace Open.Blazor.Core.Features.Chat;
 
 public partial class Chat : ComponentBase, IDisposable
 {

@@ -1,4 +1,4 @@
-﻿namespace Open.Blazor.Ui.Features.Shared;
+﻿namespace Open.Blazor.Core.Features.Shared;
 
 
 public static class AppSection

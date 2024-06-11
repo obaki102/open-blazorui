@@ -2,8 +2,8 @@
 using System.Net;
 using System.Text.Json;
 using FluentAssertions;
-using Open.Blazor.Ui.Features.Shared;
-using Open.Blazor.Ui.Features.Shared.Models;
+using Open.Blazor.Core.Features.Shared;
+using Open.Blazor.Core.Features.Shared.Models;
 
 
 namespace Open.Blazor.Tests.OllamaServiceTests;

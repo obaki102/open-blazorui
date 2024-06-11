@@ -1,4 +1,4 @@
-﻿namespace Open.Blazor.Ui.Features.Shared.Models;
+﻿namespace Open.Blazor.Core.Features.Shared.Models;
 
 public record Error
 {

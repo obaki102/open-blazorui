@@ -1,7 +1,7 @@
 ﻿
 
 using Microsoft.SemanticKernel.ChatCompletion;
-namespace Open.Blazor.Ui.Features.Chat;
+namespace Open.Blazor.Core.Features.Chat;
 
 public class Discourse
 {
