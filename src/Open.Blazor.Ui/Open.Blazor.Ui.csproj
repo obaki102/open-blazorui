@@ -6,15 +6,12 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 
-	
-
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="Open.Blazor.Tests" />
 
 	</ItemGroup>
 
-	
 
 
 	<ItemGroup>
