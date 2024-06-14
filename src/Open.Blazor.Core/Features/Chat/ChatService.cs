@@ -20,7 +20,7 @@ internal sealed class ChatService
                 modelId: model,
                 endpoint: new Uri(Default.baseUrl),
                 apiKey: null,
-                httpClient: OperatingSystem.IsBrowser() ? new HttpClient() : null);
+                httpClient: OperatingSystem.IsBrowser() ? new HttpClient(new CustomHttpMessageHandler()) : null);
 
         return kernelBuilder.Build();
     }
