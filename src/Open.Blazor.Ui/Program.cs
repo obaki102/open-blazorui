@@ -7,9 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-builder.Services.AddFluentUIComponents();
-builder.Services.AddChatServiceAsScoped();
-builder.Services.AddOllamaServiceAsScoped();
+
+builder.Services.AddCoreDependencies();
 
 var app = builder.Build();
 

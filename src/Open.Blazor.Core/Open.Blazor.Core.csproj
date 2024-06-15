@@ -19,6 +19,7 @@
 		<PackageReference Include="Microsoft.SemanticKernel.Planners.Handlebars" Version="1.14.1-preview" />
 		<PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.14.1-alpha" />
 		<PackageReference Include="Markdig" Version="0.37.0" />
+		<PackageReference Include="Toolbelt.Blazor.SpeechRecognition" Version="1.0.0" />
 	</ItemGroup>
 
 

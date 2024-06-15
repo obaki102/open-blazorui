@@ -1,5 +1,4 @@
-﻿
-@using Microsoft.SemanticKernel
+﻿@using Microsoft.SemanticKernel
 @using Microsoft.SemanticKernel.ChatCompletion
 @using Microsoft.SemanticKernel.Connectors.OpenAI
 @using System.Text
@@ -77,6 +76,7 @@
 
     </div>
     <div class="chat-box-container">
+
         <FluentTextArea @bind-Value=_userMessage Style="width:640px" Placeholder="Let's chat"></FluentTextArea>
 
         @if (!_isChatOngoing)
@@ -90,6 +90,17 @@
                           Appearance="Appearance.Stealth" OnClick="StopChat" />
         }
 
+        @if (!_isListening)
+        {
+             <FluentButton IconStart="@(new Icons.Filled.Size16.Record())" Style="margin-left:5px"
+                          Appearance="Appearance.Stealth" OnClick="StartListening" />
+        }
+        else
+        {
+            <FluentButton IconStart="@(new Icons.Filled.Size16.RecordStop())" Style="margin-left:5px" Color="Color.Error"
+                          Appearance="Appearance.Stealth" OnClick="StopListening" />
+
+        }
 
     </div>
 }

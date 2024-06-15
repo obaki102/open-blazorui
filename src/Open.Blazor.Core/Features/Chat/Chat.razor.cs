@@ -4,6 +4,8 @@ using Microsoft.JSInterop;
 using Microsoft.SemanticKernel;
 using Open.Blazor.Core.Features.Shared;
 using Open.Blazor.Core.Features.Shared.Models;
+using System.Text;
+using Toolbelt.Blazor.SpeechRecognition;
 
 namespace Open.Blazor.Core.Features.Chat;
 
@@ -27,6 +29,13 @@ public partial class Chat : ComponentBase, IDisposable
     private int _maxTokens = 2000;
     private IList<string> _stopSequences = default!;
     private string? _chatSystemPrompt;
+
+    //Speech recognition
+    private SpeechRecognitionResult[] _results = Array.Empty<SpeechRecognitionResult>();
+    private bool _isSpeechAvailable = false;
+    private bool _isListening = false;
+
+
     [Inject]
     ChatService ChatService { get; set; } = default!;
 
@@ -39,8 +48,18 @@ public partial class Chat : ComponentBase, IDisposable
     [Inject]
     public required IJSRuntime JsRuntime { get; set; }
 
+
+    [Inject]
+    public required SpeechRecognition SpeechRecognition { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
+
+        SpeechRecognition.Lang = "en-US";
+        SpeechRecognition.InterimResults = true;
+        SpeechRecognition.Continuous = true;
+        SpeechRecognition.Result += OnSpeechRecognized;
+
         var result = await OllamaService.GetListOfLocalModelsAsync();
 
         if (!result.IsSuccess)
@@ -60,16 +79,22 @@ public partial class Chat : ComponentBase, IDisposable
         var defaultModel = _activeOllamaModels.Models.First();
         _kernel = ChatService.CreateKernel(defaultModel.Name);
         _selectedModel = defaultModel;
-      _cancellationTokenSource = new();
+        _cancellationTokenSource = new();
 
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if(_isChatOngoing)
+        if (firstRender)
+        {
+            this._isSpeechAvailable = await this.SpeechRecognition.IsAvailableAsync();
+            StateHasChanged();
+        }
+
+        if (_isChatOngoing)
             await ScrollToBottom();
     }
-      
+
 
     private async Task SendMessage()
     {
@@ -80,7 +105,7 @@ public partial class Chat : ComponentBase, IDisposable
             _discourse.AddChatMessage(ChatRole.User, _userMessage, _selectedModel.Name);
             _discourse.AddChatMessage(ChatRole.Assistant, string.Empty, _selectedModel.Name);
             _userMessage = string.Empty;
-            ChatSettings settings = ChatSettings.New(_temperature,_topP,_presencePenalty,_frequencyPenalty,_maxTokens,default,_chatSystemPrompt);
+            ChatSettings settings = ChatSettings.New(_temperature, _topP, _presencePenalty, _frequencyPenalty, _maxTokens, default, _chatSystemPrompt);
             await ChatService.StreamChatMessageContentAsync(_kernel, _discourse, OnStreamCompletion, settings, _cancellationTokenSource.Token);
             _discourse.ChatMessages.Last().IsDoneStreaming = true;
         }
@@ -130,9 +155,59 @@ public partial class Chat : ComponentBase, IDisposable
         StateHasChanged();
     }
 
+    private void OnSpeechRecognized(object sender, SpeechRecognitionEventArgs args)
+    {
+        _results = args.Results.Skip(args.ResultIndex).ToArray();
+        _userMessage = GetResultsString();
+        StateHasChanged();
+    }
+
+    private string GetResultsString() =>
+        string.Join("", _results.Select(result => result.Items[0].Transcript));
+
+    private bool EnsureDeviceIsAvailable()
+    {
+        if (!_isSpeechAvailable)
+        {
+            ShowError("Device not available");
+            return false;
+        }
+        return true;
+    }
+
+    private async Task StartListening()
+    {
+        if (!EnsureDeviceIsAvailable())
+            return;
+
+        if (!_isListening)
+        {
+            _isListening = true;
+            await SpeechRecognition.StartAsync();
+        }
+
+        ToastService.ShowSuccess("Listening ....");
+    }
+
+    private async Task StopListening()
+    {
+        if (!EnsureDeviceIsAvailable())
+            return;
+
+        if (_isListening)
+        {
+            _isListening = false;
+            await SpeechRecognition.StopAsync();
+        }
+
+        ToastService.ShowInfo("Stopped Listening ....");
+    }
+
     public void Dispose()
     {
         if (_cancellationTokenSource is not null)
             _cancellationTokenSource.Dispose();
+
+        SpeechRecognition.Result -= OnSpeechRecognized!;
     }
 }
