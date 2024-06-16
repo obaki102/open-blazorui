@@ -56,7 +56,7 @@ public partial class Chat : ComponentBase, IDisposable
     {
 
         SpeechRecognition.Lang = "en-US";
-        SpeechRecognition.InterimResults = true;
+        SpeechRecognition.InterimResults = false;
         SpeechRecognition.Continuous = true;
         SpeechRecognition.Result += OnSpeechRecognized;
 
@@ -104,7 +104,10 @@ public partial class Chat : ComponentBase, IDisposable
             _isChatOngoing = true;
             _discourse.AddChatMessage(ChatRole.User, _userMessage, _selectedModel.Name);
             _discourse.AddChatMessage(ChatRole.Assistant, string.Empty, _selectedModel.Name);
+
             _userMessage = string.Empty;
+            await StopListening();
+
             ChatSettings settings = ChatSettings.New(_temperature, _topP, _presencePenalty, _frequencyPenalty, _maxTokens, default, _chatSystemPrompt);
             await ChatService.StreamChatMessageContentAsync(_kernel, _discourse, OnStreamCompletion, settings, _cancellationTokenSource.Token);
             _discourse.ChatMessages.Last().IsDoneStreaming = true;
@@ -155,15 +158,25 @@ public partial class Chat : ComponentBase, IDisposable
         StateHasChanged();
     }
 
-    private void OnSpeechRecognized(object sender, SpeechRecognitionEventArgs args)
+    private void OnSpeechRecognized(object? sender, SpeechRecognitionEventArgs args)
     {
-        _results = args.Results.Skip(args.ResultIndex).ToArray();
-        _userMessage = GetResultsString();
+        if (args.Results == null || args.Results.Length <= args.ResultIndex)
+        {
+            return; 
+        }
+
+        var transcript = new StringBuilder(_userMessage);
+        foreach (var result in args.Results.Skip(args.ResultIndex))
+        {
+            if(result.IsFinal)
+                transcript.Append(result.Items![0].Transcript);
+        }
+
+        _userMessage = transcript.ToString();
+
         StateHasChanged();
     }
 
-    private string GetResultsString() =>
-        string.Join("", _results.Select(result => result.Items[0].Transcript));
 
     private bool EnsureDeviceIsAvailable()
     {
@@ -186,7 +199,7 @@ public partial class Chat : ComponentBase, IDisposable
             await SpeechRecognition.StartAsync();
         }
 
-        ToastService.ShowSuccess("Listening ....");
+        ToastService.ShowSuccess("Listening");
     }
 
     private async Task StopListening()
@@ -200,14 +213,12 @@ public partial class Chat : ComponentBase, IDisposable
             await SpeechRecognition.StopAsync();
         }
 
-        ToastService.ShowInfo("Stopped Listening ....");
+        ToastService.ShowWarning("Stopped Listening");
     }
 
     public void Dispose()
     {
-        if (_cancellationTokenSource is not null)
-            _cancellationTokenSource.Dispose();
-
+        _cancellationTokenSource?.Dispose();
         SpeechRecognition.Result -= OnSpeechRecognized!;
     }
 }

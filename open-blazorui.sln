@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Open.Blazor.Tests", "tests\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Open.Blazor.Ui.WebAssembly", "src\Open.Blazor.Ui.WebAssembly\Open.Blazor.Ui.WebAssembly.csproj", "{6AA45FEE-8D16-4378-ACB3-615D6D9E00FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Open.Blazor.Core", "src\Open.Blazor.Core\Open.Blazor.Core.csproj", "{122E1625-4C6B-4776-A72E-54B1595273D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Open.Blazor.Core", "src\Open.Blazor.Core\Open.Blazor.Core.csproj", "{122E1625-4C6B-4776-A72E-54B1595273D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
