@@ -37,6 +37,12 @@ If you prefer to use Docker Compose for managing your Docker containers, you can
 - Locate the `docker-compose-local.yml` file in the root folder of your project.
 
 - Run the following command to start the containers defined in the Docker Compose file:
+### local
 ```bash
 docker-compose -f docker-compose-local.yml up
+```
+
+### docker hub
+```bash
+docker-compose -f docker-compose.yml up
 ```
