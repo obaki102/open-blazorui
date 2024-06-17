@@ -10,15 +10,20 @@ namespace Open.Blazor.Core.Features.Chat;
 
 internal sealed class ChatService
 {
+    private readonly Config _config;
+
+    public ChatService(Config config) =>
+        _config = config;
+
     public Kernel CreateKernel(string model)
     {
         ArgumentNullException.ThrowIfNull(model);
 #pragma warning disable SKEXP0010
 
         var kernelBuilder = Kernel.CreateBuilder()
-            .AddOpenAIChatCompletion( 
+            .AddOpenAIChatCompletion(
                 modelId: model,
-                endpoint: new Uri(Default.baseUrl),
+                endpoint: new Uri(_config.ollamaUrl),
                 apiKey: null,
                 httpClient: OperatingSystem.IsBrowser() ? new HttpClient(new CustomHttpMessageHandler()) : null);
 

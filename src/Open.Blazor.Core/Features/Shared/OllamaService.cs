@@ -9,12 +9,16 @@ namespace Open.Blazor.Core.Features.Shared
     internal sealed class OllamaService
     {
         private readonly HttpClient _httpClient;
+        private readonly Config _config;
 
-        public OllamaService(HttpClient httpClient) =>
+        public OllamaService(HttpClient httpClient, Config config)
+        {
             _httpClient = httpClient;
+            _config = config;
+        }
 
         public async Task<Result<Ollama>> GetListOfLocalModelsAsync() =>
-            await GetLocalModels(Default.baseUrl);
+            await GetLocalModels(_config.ollamaUrl);
 
         public async Task<Result<Ollama>> GetListOfLocalModelsAsync(string baseUrl) =>
              await GetLocalModels(baseUrl);
@@ -37,7 +41,7 @@ namespace Open.Blazor.Core.Features.Shared
 
                 return JsonSerializer.Deserialize<Ollama>(responseBody)!;
             }
-            catch (HttpRequestException ex)
+            catch (Exception ex)
             {
                 return Result.Failure<Ollama>(Error.Failure(ex.Message));
             }

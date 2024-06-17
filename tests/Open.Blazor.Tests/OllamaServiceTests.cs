@@ -1,12 +1,11 @@
-﻿
-using System.Net;
+﻿using System.Net;
 using System.Text.Json;
 using FluentAssertions;
 using Open.Blazor.Core.Features.Shared;
 using Open.Blazor.Core.Features.Shared.Models;
 
-
 namespace Open.Blazor.Tests.OllamaServiceTests;
+
 public class MockHttpMessageHandler : DelegatingHandler
 {
     private readonly Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> _sendAsync;
@@ -21,71 +20,59 @@ public class MockHttpMessageHandler : DelegatingHandler
         return _sendAsync(request, cancellationToken);
     }
 }
+
 public class OllamaServiceTests
 {
     private HttpResponseMessage _response;
-    private HttpClient _client;
+    private readonly HttpClient _client;
+    private readonly Config _config;
 
     public OllamaServiceTests()
     {
         var handler = new MockHttpMessageHandler((request, cancellationToken) => Task.FromResult(_response));
         _client = new HttpClient(handler);
+        _config = new Config(Default.baseUrl);
     }
 
     [Fact]
     public async Task GetListOfLocalModels_ShouldReturnOllama_WhenResponseIsSuccessful()
     {
         // Arrange
-        await using var stream = new MemoryStream();
-
+        var ollama = new Ollama();
+        var jsonResponse = JsonSerializer.Serialize(ollama);
         _response = new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
-            Content = new StreamContent(stream)
+            Content = new StringContent(jsonResponse)
         };
 
-        await using var writer = new StreamWriter(stream, leaveOpen: true);
-        writer.AutoFlush = true;
-
-        var ollama = new Ollama();
-        await writer.WriteAsync(JsonSerializer.Serialize(ollama));
-        stream.Seek(0, SeekOrigin.Begin);
-
-        var service = new OllamaService(_client);
+        var service = new OllamaService(_client, _config);
 
         // Act
         var result = await service.GetListOfLocalModelsAsync();
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-
+        result.Value.Should().BeEquivalentTo(ollama);
     }
 
     [Fact]
     public async Task GetListOfLocalModels_ShouldReturnFailure_WhenResponseBodyIsNull()
     {
         // Arrange
-        await using var stream = new MemoryStream();
-
         _response = new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
-            Content = new StreamContent(stream)
+            Content = new StringContent(string.Empty) // Empty response body
         };
 
-        await using var writer = new StreamWriter(stream, leaveOpen: true);
-        writer.AutoFlush = true;
-
-        var ollama = new Ollama();
-        await writer.WriteAsync(JsonSerializer.Serialize(ollama));
-        stream.Seek(0, SeekOrigin.Begin);
-
-        var service = new OllamaService(_client);
+        var service = new OllamaService(_client, _config);
 
         // Act
         var result = await service.GetListOfLocalModelsAsync();
 
         // Assert
+        result.IsSuccess.Should().BeFalse();
         result.Error.ErrorType.Should().Be(Error.NullValue.ErrorType);
     }
 
@@ -93,51 +80,42 @@ public class OllamaServiceTests
     public async Task GetListOfLocalModels_WithCustomBaseUrl_ShouldReturnOllama_WhenResponseIsSuccessful()
     {
         // Arrange
-        await using var stream = new MemoryStream();
-
+        var ollama = new Ollama();
+        var jsonResponse = JsonSerializer.Serialize(ollama);
         _response = new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
-            Content = new StreamContent(stream)
+            Content = new StringContent(jsonResponse)
         };
 
-        await using var writer = new StreamWriter(stream, leaveOpen: true);
-        writer.AutoFlush = true;
-
-        var ollama = new Ollama();
-        await writer.WriteAsync(JsonSerializer.Serialize(ollama));
-        stream.Seek(0, SeekOrigin.Begin);
-
-        var service = new OllamaService(_client);
-        var customBaseUrl = "http://localhost:12345";
+        var service = new OllamaService(_client, _config);
+        var customBaseUrl = Default.baseUrl;
 
         // Act
         var result = await service.GetListOfLocalModelsAsync(customBaseUrl);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
+        result.Value.Should().BeEquivalentTo(ollama);
     }
 
     [Fact]
-    public async Task GetListOfLocalModelsc_ShouldThrowArgumentNullException_WhenBaseUrlIsNull()
+    public async Task GetListOfLocalModels_ShouldThrowArgumentNullException_WhenBaseUrlIsNull()
     {
-        //Arrange
-        var service = new OllamaService(_client);
+        // Arrange
+        var service = new OllamaService(_client, _config);
 
-        // Act and Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() =>  service.GetListOfLocalModelsAsync(null));
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentNullException>(() => service.GetListOfLocalModelsAsync((string)null));
     }
 
     [Fact]
-    public async Task GetListOfLocalModelsc_ShouldThrowArgumentNullException_WhenBaseUrlIsEmptyt()
+    public async Task GetListOfLocalModels_ShouldThrowArgumentException_WhenBaseUrlIsEmpty()
     {
-        //Arrange
-        var service = new OllamaService(_client);
+        // Arrange
+        var service = new OllamaService(_client, _config);
 
-        // Act and Assert
+        // Act & Assert
         await Assert.ThrowsAsync<ArgumentException>(() => service.GetListOfLocalModelsAsync(string.Empty));
-
     }
-
-
 }

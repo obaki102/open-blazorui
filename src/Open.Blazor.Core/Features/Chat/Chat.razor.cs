@@ -106,6 +106,7 @@ public partial class Chat : ComponentBase, IDisposable
             _discourse.AddChatMessage(ChatRole.Assistant, string.Empty, _selectedModel.Name);
 
             _userMessage = string.Empty;
+    
             await StopListening();
 
             ChatSettings settings = ChatSettings.New(_temperature, _topP, _presencePenalty, _frequencyPenalty, _maxTokens, default, _chatSystemPrompt);
@@ -197,9 +198,10 @@ public partial class Chat : ComponentBase, IDisposable
         {
             _isListening = true;
             await SpeechRecognition.StartAsync();
+            ToastService.ShowSuccess("Listening");
         }
 
-        ToastService.ShowSuccess("Listening");
+    
     }
 
     private async Task StopListening()
@@ -211,9 +213,10 @@ public partial class Chat : ComponentBase, IDisposable
         {
             _isListening = false;
             await SpeechRecognition.StopAsync();
+            ToastService.ShowWarning("Stopped Listening");
         }
 
-        ToastService.ShowWarning("Stopped Listening");
+       
     }
 
     public void Dispose()
