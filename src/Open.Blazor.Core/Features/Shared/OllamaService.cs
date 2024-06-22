@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace Open.Blazor.Core.Features.Shared
 {
-    internal sealed class OllamaService
+  public sealed class OllamaService
     {
         private readonly HttpClient _httpClient;
         private readonly Config _config;
@@ -18,7 +18,7 @@ namespace Open.Blazor.Core.Features.Shared
         }
 
         public async Task<Result<Ollama>> GetListOfLocalModelsAsync() =>
-            await GetLocalModels(_config.ollamaUrl);
+            await GetLocalModels(_config.OllamaUrl);
 
         public async Task<Result<Ollama>> GetListOfLocalModelsAsync(string baseUrl) =>
              await GetLocalModels(baseUrl);

@@ -28,6 +28,26 @@ namespace Open.Blazor.Core.Features.Shared
             return services;
         }
 
+        public static IServiceCollection AddWsCoreDependencies(this IServiceCollection services)
+        {
+            ArgumentNullException.ThrowIfNull(services);
+            services.AddSingleton(serviceProvider =>
+            {
+                if (TryGetEnvironmentVariable("OLLAMA_BASE_URL", out string ollamaBaseUrl))
+                {
+                    return new Config(ollamaBaseUrl);
+
+                }
+
+                return new Config(Default.baseUrl);
+            });
+
+            services.AddFluentUIComponents();
+            services.AddOllamaServiceAsScoped();
+            services.AddSpeechRecognition();
+            return services;
+        }
+
         private static bool TryGetEnvironmentVariable(string variableName, out string value)
         {
             value = Environment.GetEnvironmentVariable(variableName) ?? string.Empty;

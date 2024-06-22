@@ -23,9 +23,8 @@ internal sealed class ChatService
         var kernelBuilder = Kernel.CreateBuilder()
             .AddOpenAIChatCompletion(
                 modelId: model,
-                endpoint: new Uri(_config.ollamaUrl),
-                apiKey: null,
-                httpClient: OperatingSystem.IsBrowser() ? new HttpClient(new CustomHttpMessageHandler()) : null);
+                endpoint: new Uri(_config.OllamaUrl),
+                apiKey: null);
 
         return kernelBuilder.Build();
     }
