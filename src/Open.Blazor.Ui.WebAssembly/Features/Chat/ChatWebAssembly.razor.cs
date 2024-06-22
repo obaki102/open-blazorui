@@ -112,7 +112,7 @@ public partial class ChatWebAssembly : ComponentBase, IDisposable
                 Version = new Version(3, 0),
                 VersionPolicy = HttpVersionPolicy.RequestVersionOrLower
             };
-
+            request.Headers.Add("Origin", "http://localhost");
             request.SetBrowserResponseStreamingEnabled(true);
             request.Headers.Add("Accept", "application/x-ndjson");
             using HttpResponseMessage response = await HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, _cancellationTokenSource.Token);
