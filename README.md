@@ -47,3 +47,9 @@ docker-compose -f docker-compose-local.yml up
 ```bash
 docker-compose -f docker-compose.yml up
 ```
+# FAQ
+### How to access Ollama using the GitHub pages.
+**A:** Run the following command when starting Ollama on your machine.
+```bash
+$env:OLLAMA_ORIGINS="https://obaki102.github.io"; ollama serve
+```
