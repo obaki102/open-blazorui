@@ -32,7 +32,7 @@ public partial class ChatWebAssembly : ComponentBase, IDisposable
 
 
     [Inject]
-    HttpClient HttpClient { get; set; } = default!;
+    ChatHttpClient ChatHttpClient { get; set; } = default!;
 
     [Inject]
     OllamaService OllamaService { get; set; } = default!;
@@ -42,7 +42,6 @@ public partial class ChatWebAssembly : ComponentBase, IDisposable
 
     [Inject]
     public required IJSRuntime JsRuntime { get; set; }
-
 
     [Inject]
     public required SpeechRecognition SpeechRecognition { get; set; }
@@ -102,26 +101,8 @@ public partial class ChatWebAssembly : ComponentBase, IDisposable
             _userMessage = string.Empty;
             await InvokeAsync(StateHasChanged);
             await StopListening();
-         
-            var content = JsonContent.Create(promptRequest);
-            var request = new HttpRequestMessage
-            {
-                Content = content,
-                Method = HttpMethod.Post,
-                RequestUri = new Uri("http://localhost:11434/api/generate", UriKind.Absolute),
-                Version = new Version(3, 0),
-                VersionPolicy = HttpVersionPolicy.RequestVersionOrLower
-            };
-            request.Headers.Add("Origin", "http://localhost");
-            request.SetBrowserResponseStreamingEnabled(true);
-            request.Headers.Add("Accept", "application/x-ndjson");
-            using HttpResponseMessage response = await HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, _cancellationTokenSource.Token);
 
-            if (response.IsSuccessStatusCode)
-            {
-                await AddResponseAsync(response, _cancellationTokenSource.Token);
-
-            }
+            await ChatHttpClient.StreamPostAsync("http://localhost:11434/api/generate", promptRequest, OnStreamCompletion, _cancellationTokenSource.Token);
 
             _discourse.ChatMessages.Last().IsDoneStreaming = true;
         }
@@ -132,33 +113,28 @@ public partial class ChatWebAssembly : ComponentBase, IDisposable
         }
         finally
         {
-            if (!_cancellationTokenSource.TryReset())
-            {
-                //if cancelled clean-up the old cts and create a new one 
-                _cancellationTokenSource.Dispose();
-                _cancellationTokenSource = new();
-            }
-
-            _isChatOngoing = false;
+            ResetCancellationTokenSource();
+             _isChatOngoing = false;
 
         }
     }
 
-    private async Task AddResponseAsync(HttpResponseMessage response, CancellationToken token)
-    {
-        await foreach (var promptResponse in response.Content.ReadFromNdjsonAsync<PromptResponse>(cancellationToken: _cancellationTokenSource.Token))
-        {
-            if (promptResponse is null) continue;
-            _discourse.ChatMessages.Last().Content += promptResponse.Response;
-            await ScrollToBottom();
-        }
-    }
+
 
     //See if this can be optimize further
-    private Task OnStreamCompletion(string updatedContent)
+    private async Task OnStreamCompletion(string updatedContent)
     {
         _discourse.ChatMessages.Last().Content += updatedContent;
-        return Task.CompletedTask;
+        await ScrollToBottom();
+    }
+
+    private void ResetCancellationTokenSource()
+    {
+        if (!_cancellationTokenSource.TryReset())
+        {
+            _cancellationTokenSource.Dispose();
+            _cancellationTokenSource = new CancellationTokenSource();
+        }
     }
 
     private void ShowError(string errorMessage) =>
@@ -220,8 +196,6 @@ public partial class ChatWebAssembly : ComponentBase, IDisposable
             await SpeechRecognition.StartAsync();
             ToastService.ShowSuccess("Listening");
         }
-
-
     }
 
     private async Task StopListening()
@@ -235,8 +209,6 @@ public partial class ChatWebAssembly : ComponentBase, IDisposable
             await SpeechRecognition.StopAsync();
             ToastService.ShowWarning("Stopped Listening");
         }
-
-
     }
 
     public void Dispose()

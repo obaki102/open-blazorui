@@ -120,15 +120,8 @@ public partial class Chat : ComponentBase, IDisposable
         }
         finally
         {
-            if (!_cancellationTokenSource.TryReset())
-            {
-                //if cancelled clean-up the old cts and create a new one 
-                _cancellationTokenSource.Dispose();
-                _cancellationTokenSource = new();
-            }
-
+            ResetCancellationTokenSource();
             _isChatOngoing = false;
-
         }
     }
 
@@ -138,6 +131,15 @@ public partial class Chat : ComponentBase, IDisposable
     {
         _discourse.ChatMessages.Last().Content += updatedContent;
         return Task.CompletedTask;
+    }
+
+    private void ResetCancellationTokenSource()
+    {
+        if (!_cancellationTokenSource.TryReset())
+        {
+            _cancellationTokenSource.Dispose();
+            _cancellationTokenSource = new CancellationTokenSource();
+        }
     }
 
     private void ShowError(string errorMessage) =>
