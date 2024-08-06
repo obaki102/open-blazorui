@@ -39,7 +39,7 @@ public class ChatHttpClient
         await foreach (var promptResponse in response.Content.ReadFromNdjsonAsync<PromptResponse>(cancellationToken: token))
         {
             if (promptResponse is null) continue;
-            await onStreamCompletion.Invoke(promptResponse.Response ?? string.Empty);
+                await onStreamCompletion.Invoke(promptResponse.Response ?? string.Empty);
         }
     }
 }
