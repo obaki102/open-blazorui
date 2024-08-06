@@ -7,7 +7,7 @@ Drawing inspiration from the fantastic -  [open-webui](https://github.com/open-w
 
 # Running open-blazorui with Docker
 
-This guide explains how to build and run the Media Toolkit Docker image.
+This guide explains how to build and run the open-blazorui Docker image.
 
 ## Prerequisites
 
