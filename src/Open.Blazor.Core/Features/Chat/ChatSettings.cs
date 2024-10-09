@@ -43,6 +43,19 @@ public struct ChatSettings
     {
         return new ChatSettings(temperature, topP, presencePenalty, frequencyPenalty, maxTokens, stopSequences, chatSystemPrompt);
     }
+
+    public static ChatSettings Default()
+    {
+        return new ChatSettings(
+            temperature: 0.7, 
+            topP: 0.9,        
+            presencePenalty: 0.0,
+            frequencyPenalty: 0.0, 
+            maxTokens: 1000,   
+            stopSequences: null, 
+            chatSystemPrompt: "Default system prompt"
+        );
+    }
 }
 
 public static class ChatSettingsExtensions

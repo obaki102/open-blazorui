@@ -36,6 +36,10 @@ public partial class Chat : ComponentBase, IDisposable
     private bool _isListening = false;
 
 
+    [Parameter]
+    public bool UseSemanticKernel { get; set; }
+
+
     [Inject]
     ChatService ChatService { get; set; } = default!;
 
@@ -77,7 +81,11 @@ public partial class Chat : ComponentBase, IDisposable
         }
 
         var defaultModel = _activeOllamaModels.Models.First();
-        _kernel = ChatService.CreateKernel(defaultModel.Name);
+        if (UseSemanticKernel)
+        {
+            _kernel = ChatService.CreateKernel(defaultModel.Name);
+        }
+
         _selectedModel = defaultModel;
         _cancellationTokenSource = new();
 
@@ -106,11 +114,20 @@ public partial class Chat : ComponentBase, IDisposable
             _discourse.AddChatMessage(MessageRole.Assistant, string.Empty, _selectedModel.Name);
 
             _userMessage = string.Empty;
-    
+
             await StopListening();
 
             ChatSettings settings = ChatSettings.New(_temperature, _topP, _presencePenalty, _frequencyPenalty, _maxTokens, default, _chatSystemPrompt);
-            await ChatService.StreamChatMessageContentAsync(_kernel, _discourse, OnStreamCompletion, settings, _cancellationTokenSource.Token);
+
+            if (UseSemanticKernel)
+            {
+                await ChatService.StreamChatMessageContentAsync(_kernel, _discourse, OnStreamCompletion, settings, _cancellationTokenSource.Token);
+            }
+            else
+            {
+                await ChatService.StreamChatMessageContentAsync(_discourse, OnStreamCompletion, settings, _cancellationTokenSource.Token);
+            }
+
             _discourse.ChatMessages.Last().IsDoneStreaming = true;
         }
         catch (Exception ex)
@@ -149,7 +166,10 @@ public partial class Chat : ComponentBase, IDisposable
     private void HandleSelectedOptionChanged(OllamaModel selectedModelChanged)
     {
         _selectedModel = selectedModelChanged;
-        _kernel = ChatService.CreateKernel(_selectedModel.Name);
+        if (UseSemanticKernel)
+        {
+            _kernel = ChatService.CreateKernel(_selectedModel.Name);
+        }
     }
 
     private async Task StopChat() =>
@@ -165,13 +185,13 @@ public partial class Chat : ComponentBase, IDisposable
     {
         if (args.Results == null || args.Results.Length <= args.ResultIndex)
         {
-            return; 
+            return;
         }
 
         var transcript = new StringBuilder(_userMessage);
         foreach (var result in args.Results.Skip(args.ResultIndex))
         {
-            if(result.IsFinal)
+            if (result.IsFinal)
                 transcript.Append(result.Items![0].Transcript);
         }
 
@@ -202,8 +222,6 @@ public partial class Chat : ComponentBase, IDisposable
             await SpeechRecognition.StartAsync();
             ToastService.ShowSuccess("Listening");
         }
-
-    
     }
 
     private async Task StopListening()
@@ -217,8 +235,6 @@ public partial class Chat : ComponentBase, IDisposable
             await SpeechRecognition.StopAsync();
             ToastService.ShowWarning("Stopped Listening");
         }
-
-       
     }
 
     public void Dispose()
