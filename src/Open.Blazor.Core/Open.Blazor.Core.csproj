@@ -20,6 +20,7 @@
 		<PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.14.1-alpha" />
 		<PackageReference Include="Markdig" Version="0.37.0" />
 		<PackageReference Include="Toolbelt.Blazor.SpeechRecognition" Version="1.0.0" />
+		<PackageReference Include="Microsoft.Extensions.AI.Ollama" Version="9.0.0-preview.9.24507.7" />
 	</ItemGroup>
 
 

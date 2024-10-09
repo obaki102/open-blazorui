@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 
 namespace Open.Blazor.Core.Features.Chat;
@@ -60,6 +61,22 @@ public static class ChatSettingsExtensions
             MaxTokens = chatSettings.MaxTokens,
             StopSequences = chatSettings.StopSequences,
             ChatSystemPrompt = chatSettings.ChatSystemPrompt
+
+        };
+    }
+
+    public static ChatOptions ToChatOptions(this ChatSettings chatSettings)
+    {
+        ArgumentNullException.ThrowIfNull(chatSettings);
+
+        return new ChatOptions
+        {
+            Temperature = (float)chatSettings.Temperature,
+            TopP = (float)chatSettings.TopP,
+            PresencePenalty = (float)chatSettings.PresencePenalty,
+            FrequencyPenalty = (float)chatSettings.FrequencyPenalty,
+            StopSequences = chatSettings.StopSequences
+
 
         };
     }

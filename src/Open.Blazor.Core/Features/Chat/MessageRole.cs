@@ -1,6 +1,6 @@
 ﻿namespace Open.Blazor.Core.Features.Chat;
 
-public enum ChatRole
+public enum MessageRole
 {
     User,
     Assistant,

@@ -2,7 +2,7 @@
 @if (Message is not null)
 {
     <div class="chat-content" style="text-align:@_alignment;">
-        @if (Message.Role == ChatRole.User)
+        @if (Message.Role == MessageRole.User)
         {
             <div class="card-container">
                 <div class="card">
@@ -39,7 +39,7 @@
 @code {
 
     [Parameter]
-    public ChatMessage? Message { get; set; }
+    public MessageContent? Message { get; set; }
 
     [Parameter]
     public IJSRuntime? JsRuntime { get; set; }
@@ -50,7 +50,7 @@
     private string _alignment = string.Empty;
 
     protected override void OnParametersSet() =>
-        _alignment = Message!.Role == ChatRole.Assistant ? "left" : "right";
+        _alignment = Message!.Role == MessageRole.Assistant ? "left" : "right";
 
     private async Task CopyToClipboard()
     {

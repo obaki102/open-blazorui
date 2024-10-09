@@ -96,7 +96,7 @@ public class ChatServiceTests
         var kernel = service.CreateKernel(Model);
         var discourse = new Discourse();
         var chatSettings = new ChatSettings();
-        discourse.AddChatMessage(ChatRole.User, "Hello", Model);
+        discourse.AddChatMessage(MessageRole.User, "Hello", Model);
         bool onStreamCompletionCalled = false;
 
         Func<string, Task> onStreamCompletion = async message =>
@@ -106,6 +106,68 @@ public class ChatServiceTests
         };
 
         await service.StreamChatMessageContentAsync(kernel, discourse, onStreamCompletion, chatSettings);
+
+        Assert.True(onStreamCompletionCalled);
+    }
+
+    [Fact]
+    public async Task StreamChatMessageContentAsync_ShouldThrowArgumentNullException_WhenDiscourseIsNull()
+    {
+        var service = new ChatService(_config);
+        var chatSettings = new ChatSettings();
+        Func<string, Task> onStreamCompletion = async _ => await Task.CompletedTask;
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() =>
+            service.StreamChatMessageContentAsync(null, onStreamCompletion, chatSettings));
+    }
+
+    [Fact]
+    public async Task StreamChatMessageContentAsync_ShouldThrowArgumentNullException_WhenOnStreamCompletionIsNull()
+    {
+        var service = new ChatService(_config);
+        var discourse = new Discourse();
+        var chatSettings = new ChatSettings();
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() =>
+            service.StreamChatMessageContentAsync(discourse, null, chatSettings));
+    }
+
+
+    [Fact]
+    public async Task StreamChatMessageContentAsync_ShouldReturnWhenCancellationIsRequested()
+    {
+        var service = new ChatService(_config);
+        var discourse = new Discourse();
+        var chatSettings = new ChatSettings();
+        Func<string, Task> onStreamCompletion = async _ => await Task.CompletedTask;
+
+        using (var cts = new CancellationTokenSource())
+        {
+            var task = service.StreamChatMessageContentAsync(discourse, onStreamCompletion, chatSettings, cts.Token);
+            Assert.False(task.IsCompleted);
+
+            cts.Cancel();
+
+            await Assert.ThrowsAsync<TaskCanceledException>(() => task);
+        }
+    }
+
+    [Fact]
+    public async Task StreamChatMessageContentAsync_ShouldProcessMessagesSuccessfully()
+    {
+        var service = new ChatService(_config);
+        var discourse = new Discourse();
+        var chatSettings = new ChatSettings();
+        discourse.AddChatMessage(MessageRole.User, "Hello", Model);
+        bool onStreamCompletionCalled = false;
+
+        Func<string, Task> onStreamCompletion = async message =>
+        {
+            onStreamCompletionCalled = true;
+            await Task.CompletedTask;
+        };
+
+        await service.StreamChatMessageContentAsync(discourse, onStreamCompletion, chatSettings);
 
         Assert.True(onStreamCompletionCalled);
     }

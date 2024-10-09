@@ -94,8 +94,8 @@ public partial class ChatWebAssembly : ComponentBase, IDisposable
         {
             if (string.IsNullOrWhiteSpace(_userMessage)) return;
             _isChatOngoing = true;
-            _discourse.AddChatMessage(ChatRole.User, _userMessage, _selectedModel.Name);
-            _discourse.AddChatMessage(ChatRole.Assistant, string.Empty, _selectedModel.Name);
+            _discourse.AddChatMessage(MessageRole.User, _userMessage, _selectedModel.Name);
+            _discourse.AddChatMessage(MessageRole.Assistant, string.Empty, _selectedModel.Name);
 
             var promptRequest = new PromptRequest(_selectedModel.Name, _userMessage);
             _userMessage = string.Empty;

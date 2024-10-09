@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.Extensions.AI;
 using Open.Blazor.Core.Features.Shared;
 
 
@@ -12,8 +13,14 @@ internal sealed class ChatService
 {
     private readonly Config _config;
 
-    public ChatService(Config config) =>
+    private readonly IChatClient _client;
+
+    public ChatService(Config config)
+    {
         _config = config;
+        //test
+        _client = new OllamaChatClient(new Uri(_config.OllamaUrl), "mistral:latest");
+    }
 
     public Kernel CreateKernel(string model)
     {
@@ -31,10 +38,10 @@ internal sealed class ChatService
 
 
     public async Task StreamChatMessageContentAsync(Kernel kernel,
-    Discourse discourse,
-    Func<string, Task> onStreamCompletion,
-    ChatSettings chatSettings,
-    CancellationToken cancellationToken = default)
+        Discourse discourse,
+        Func<string, Task> onStreamCompletion,
+        ChatSettings chatSettings,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(kernel);
         ArgumentNullException.ThrowIfNull(discourse);
@@ -55,6 +62,32 @@ internal sealed class ChatService
             }
 
             await onStreamCompletion.Invoke(completionResult.Content ?? string.Empty);
+
+        }
+    }
+
+    public async Task StreamChatMessageContentAsync(Discourse discourse,
+       Func<string, Task> onStreamCompletion,
+       ChatSettings chatSettings,
+       CancellationToken cancellationToken = default)
+    {
+
+        ArgumentNullException.ThrowIfNull(discourse);
+        ArgumentNullException.ThrowIfNull(onStreamCompletion);
+        ArgumentNullException.ThrowIfNull(chatSettings);
+
+
+
+        var chatOptions = chatSettings.ToChatOptions();
+        var history = discourse.ToChatMessages();
+        await foreach (var completionResult in _client.CompleteStreamingAsync(history, chatOptions, cancellationToken))
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            await onStreamCompletion.Invoke(completionResult.Text ?? string.Empty);
 
         }
     }
