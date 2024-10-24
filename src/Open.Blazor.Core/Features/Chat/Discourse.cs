@@ -1,7 +1,6 @@
-﻿
-
-using Microsoft.Extensions.AI;
+﻿using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel.ChatCompletion;
+
 namespace Open.Blazor.Core.Features.Chat;
 
 public class Discourse
@@ -9,28 +8,34 @@ public class Discourse
     public Guid? Id { get; set; }
     public string Model { get; set; } = default!;
     public List<MessageContent> ChatMessages { get; set; } = [];
-    public void AddChatMessage(MessageRole role, string content, string model) =>
-        ChatMessages.Add(MessageContent.New(role, content, model));
 
+    public void AddChatMessage(MessageRole role, string content, string model)
+    {
+        ChatMessages.Add(MessageContent.New(role, content, model));
+    }
 }
 
 public static class DiscourseExtensions
 {
-    private static AuthorRole MapToAuthorRole(MessageRole role) =>
-        role switch
+    private static AuthorRole MapToAuthorRole(MessageRole role)
+    {
+        return role switch
         {
             MessageRole.System => AuthorRole.System,
             MessageRole.User => AuthorRole.User,
             _ => AuthorRole.Assistant
         };
+    }
 
-    private static ChatRole MapToChatRole(MessageRole role) =>
-        role switch
+    private static ChatRole MapToChatRole(MessageRole role)
+    {
+        return role switch
         {
             MessageRole.System => ChatRole.System,
             MessageRole.User => ChatRole.User,
             _ => ChatRole.Assistant
         };
+    }
 
     private static MessageRole MapToMessageRole(AuthorRole role)
     {
@@ -63,6 +68,7 @@ public static class DiscourseExtensions
             var role = MapToAuthorRole(chat.Role);
             chatHistory.AddMessage(role, chat.Content);
         }
+
         return chatHistory;
     }
 
@@ -82,6 +88,7 @@ public static class DiscourseExtensions
             var role = MapToMessageRole(chat.Role);
             discourse.AddChatMessage(role, chat.Content ?? string.Empty, model);
         }
+
         return discourse;
     }
 
@@ -93,7 +100,7 @@ public static class DiscourseExtensions
             var role = MapToMessageRole(chat.Role);
             discourse.AddChatMessage(role, chat.Text ?? string.Empty, model);
         }
+
         return discourse;
     }
 }
-

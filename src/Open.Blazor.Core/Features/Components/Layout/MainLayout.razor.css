@@ -10,9 +10,9 @@
     cursor: pointer;
 }
 
-    .label-header:hover {
-        color: #59BEFC;
-        background-color: #f0f0f0;
-        padding: 2px;
-        border-radius: 5px;
-    }
+.label-header:hover {
+    color: #59BEFC;
+    background-color: #f0f0f0;
+    padding: 2px;
+    border-radius: 5px;
+}

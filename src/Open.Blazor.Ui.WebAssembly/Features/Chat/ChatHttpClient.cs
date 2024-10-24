@@ -1,23 +1,23 @@
-﻿using Microsoft.AspNetCore.Components.WebAssembly.Http;
-using System.Net.Http.Headers;
-using System.Text.Json;
+﻿using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
+using Microsoft.AspNetCore.Components.WebAssembly.Http;
 using Ndjson.AsyncStreams.Net.Http;
-
 
 namespace Open.Blazor.Ui.WebAssembly.Features.Chat;
 
 public class ChatHttpClient
 {
     private readonly HttpClient _httpClient;
+
     public ChatHttpClient(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }
 
     public async Task StreamPostAsync(string url,
-    PromptRequest content, Func<string, Task> onStreamCompletion,
-    CancellationToken cancellationToken)
+        PromptRequest content, Func<string, Task> onStreamCompletion,
+        CancellationToken cancellationToken)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, url)
         {
@@ -28,22 +28,24 @@ public class ChatHttpClient
         request.SetBrowserResponseStreamingEnabled(true);
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-ndjson"));
 
-        using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        using var response =
+            await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         response.EnsureSuccessStatusCode();
 
         await StreamResponseAsync(response, onStreamCompletion, cancellationToken);
     }
 
-    private async Task StreamResponseAsync(HttpResponseMessage response, Func<string, Task> onStreamCompletion, CancellationToken token)
+    private async Task StreamResponseAsync(HttpResponseMessage response, Func<string, Task> onStreamCompletion,
+        CancellationToken token)
     {
-        await foreach (var promptResponse in response.Content.ReadFromNdjsonAsync<PromptResponse>(cancellationToken: token))
+        await foreach (var promptResponse in response.Content.ReadFromNdjsonAsync<PromptResponse>(
+                           cancellationToken: token))
         {
             if (promptResponse is null) continue;
-                await onStreamCompletion.Invoke(promptResponse.Response ?? string.Empty);
+            await onStreamCompletion.Invoke(promptResponse.Response ?? string.Empty);
         }
     }
 }
-
 
 public static class ChatHttpClientExtensions
 {
@@ -54,4 +56,3 @@ public static class ChatHttpClientExtensions
         return services;
     }
 }
-

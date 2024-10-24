@@ -1,37 +1,37 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
-	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
-	</PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
 
 
-	<ItemGroup>
-		<SupportedPlatform Include="browser" />
-	</ItemGroup>
+    <ItemGroup>
+        <SupportedPlatform Include="browser"/>
+    </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.8" />
-		<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.*-* " />
-		<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.*-* " />
-		<PackageReference Include="Microsoft.SemanticKernel" Version="1.21.1" />
-		<PackageReference Include="Microsoft.SemanticKernel.Planners.Handlebars" Version="1.14.1-preview" />
-		<PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.14.1-alpha" />
-		<PackageReference Include="Markdig" Version="0.37.0" />
-		<PackageReference Include="Toolbelt.Blazor.SpeechRecognition" Version="1.0.0" />
-		<PackageReference Include="Microsoft.Extensions.AI.Ollama" Version="9.0.0-preview.9.24507.7" />
-	</ItemGroup>
-
-
-	<ItemGroup>
-		<InternalsVisibleTo Include="Open.Blazor.Tests" />
-
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.8"/>
+        <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.*-* "/>
+        <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.*-* "/>
+        <PackageReference Include="Microsoft.SemanticKernel" Version="1.21.1"/>
+        <PackageReference Include="Microsoft.SemanticKernel.Planners.Handlebars" Version="1.14.1-preview"/>
+        <PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.14.1-alpha"/>
+        <PackageReference Include="Markdig" Version="0.37.0"/>
+        <PackageReference Include="Toolbelt.Blazor.SpeechRecognition" Version="1.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.AI.Ollama" Version="9.0.0-preview.9.24507.7"/>
+    </ItemGroup>
 
 
-	<ItemGroup>
-	  <Folder Include="wwwroot\" />
-	</ItemGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="Open.Blazor.Tests"/>
+
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <Folder Include="wwwroot\"/>
+    </ItemGroup>
 
 </Project>

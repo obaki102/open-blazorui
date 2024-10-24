@@ -1,54 +1,50 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Text;
+using Microsoft.AspNetCore.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Open.Blazor.Core.Features.Shared.Models;
-using System.Net.Http.Json;
-using System.Text;
-using Toolbelt.Blazor.SpeechRecognition;
-using Ndjson.AsyncStreams.Net.Http;
 using Open.Blazor.Core.Features.Chat;
 using Open.Blazor.Core.Features.Shared;
-using Microsoft.AspNetCore.Components.WebAssembly.Http;
-
+using Open.Blazor.Core.Features.Shared.Models;
+using Toolbelt.Blazor.SpeechRecognition;
 
 namespace Open.Blazor.Ui.WebAssembly.Features.Chat;
 
 public partial class ChatWebAssembly : ComponentBase, IDisposable
 {
+    private Ollama? _activeOllamaModels = default!;
+    private CancellationTokenSource _cancellationTokenSource = default!;
 
     //todo support history
     private Discourse _discourse = new();
-    private string _userMessage = string.Empty;
     private bool _isChatOngoing = false;
+    private bool _isListening = false;
     private bool _isOllamaUp = false;
-    private Ollama? _activeOllamaModels = default!;
-    private OllamaModel _selectedModel = default!;
-    private CancellationTokenSource _cancellationTokenSource = default!;
+    private bool _isSpeechAvailable = false;
 
     //Speech recognition
     private SpeechRecognitionResult[] _results = Array.Empty<SpeechRecognitionResult>();
-    private bool _isSpeechAvailable = false;
-    private bool _isListening = false;
+    private OllamaModel _selectedModel = default!;
+    private string _userMessage = string.Empty;
 
 
-    [Inject]
-    ChatHttpClient ChatHttpClient { get; set; } = default!;
+    [Inject] private ChatHttpClient ChatHttpClient { get; set; } = default!;
 
-    [Inject]
-    OllamaService OllamaService { get; set; } = default!;
+    [Inject] private OllamaService OllamaService { get; set; } = default!;
 
-    [Inject]
-    public required IToastService ToastService { get; set; }
+    [Inject] public required IToastService ToastService { get; set; }
 
-    [Inject]
-    public required IJSRuntime JsRuntime { get; set; }
+    [Inject] public required IJSRuntime JsRuntime { get; set; }
 
-    [Inject]
-    public required SpeechRecognition SpeechRecognition { get; set; }
+    [Inject] public required SpeechRecognition SpeechRecognition { get; set; }
+
+    public void Dispose()
+    {
+        _cancellationTokenSource?.Dispose();
+        SpeechRecognition.Result -= OnSpeechRecognized!;
+    }
 
     protected override async Task OnInitializedAsync()
     {
-
         SpeechRecognition.Lang = "en-US";
         SpeechRecognition.InterimResults = false;
         SpeechRecognition.Continuous = true;
@@ -73,8 +69,7 @@ public partial class ChatWebAssembly : ComponentBase, IDisposable
 
         var defaultModel = _activeOllamaModels.Models.First();
         _selectedModel = defaultModel;
-        _cancellationTokenSource = new();
-
+        _cancellationTokenSource = new CancellationTokenSource();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -84,7 +79,6 @@ public partial class ChatWebAssembly : ComponentBase, IDisposable
             _isSpeechAvailable = await SpeechRecognition.IsAvailableAsync();
             StateHasChanged();
         }
-
     }
 
 
@@ -102,7 +96,8 @@ public partial class ChatWebAssembly : ComponentBase, IDisposable
             await InvokeAsync(StateHasChanged);
             await StopListening();
 
-            await ChatHttpClient.StreamPostAsync("http://localhost:11434/api/generate", promptRequest, OnStreamCompletion, _cancellationTokenSource.Token);
+            await ChatHttpClient.StreamPostAsync("http://localhost:11434/api/generate", promptRequest,
+                OnStreamCompletion, _cancellationTokenSource.Token);
 
             _discourse.ChatMessages.Last().IsDoneStreaming = true;
         }
@@ -114,11 +109,9 @@ public partial class ChatWebAssembly : ComponentBase, IDisposable
         finally
         {
             ResetCancellationTokenSource();
-             _isChatOngoing = false;
-
+            _isChatOngoing = false;
         }
     }
-
 
 
     //See if this can be optimize further
@@ -137,8 +130,10 @@ public partial class ChatWebAssembly : ComponentBase, IDisposable
         }
     }
 
-    private void ShowError(string errorMessage) =>
-         ToastService.ShowError(errorMessage);
+    private void ShowError(string errorMessage)
+    {
+        ToastService.ShowError(errorMessage);
+    }
 
 
     private void HandleSelectedOptionChanged(OllamaModel selectedModelChanged)
@@ -146,8 +141,10 @@ public partial class ChatWebAssembly : ComponentBase, IDisposable
         _selectedModel = selectedModelChanged;
     }
 
-    private async Task StopChat() =>
+    private async Task StopChat()
+    {
         await _cancellationTokenSource.CancelAsync();
+    }
 
     private async Task ScrollToBottom()
     {
@@ -157,17 +154,12 @@ public partial class ChatWebAssembly : ComponentBase, IDisposable
 
     private void OnSpeechRecognized(object? sender, SpeechRecognitionEventArgs args)
     {
-        if (args.Results == null || args.Results.Length <= args.ResultIndex)
-        {
-            return;
-        }
+        if (args.Results == null || args.Results.Length <= args.ResultIndex) return;
 
         var transcript = new StringBuilder(_userMessage);
         foreach (var result in args.Results.Skip(args.ResultIndex))
-        {
             if (result.IsFinal)
                 transcript.Append(result.Items![0].Transcript);
-        }
 
         _userMessage = transcript.ToString();
 
@@ -182,6 +174,7 @@ public partial class ChatWebAssembly : ComponentBase, IDisposable
             ShowError("Device not available");
             return false;
         }
+
         return true;
     }
 
@@ -209,11 +202,5 @@ public partial class ChatWebAssembly : ComponentBase, IDisposable
             await SpeechRecognition.StopAsync();
             ToastService.ShowWarning("Stopped Listening");
         }
-    }
-
-    public void Dispose()
-    {
-        _cancellationTokenSource?.Dispose();
-        SpeechRecognition.Result -= OnSpeechRecognized!;
     }
 }

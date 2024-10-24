@@ -1,7 +1,6 @@
 using Open.Blazor.Core.Features.Chat;
 using Open.Blazor.Core.Features.Shared;
 
-
 namespace Open.Blazor.Tests.ChatServiceTests;
 
 public class ChatServiceTests
@@ -44,29 +43,34 @@ public class ChatServiceTests
         var chatSettings = new ChatSettings();
         Func<string, Task> onStreamCompletion = async _ => await Task.CompletedTask;
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => service.StreamChatMessageContentAsync(null, discourse, onStreamCompletion, chatSettings));
+        await Assert.ThrowsAsync<ArgumentNullException>(() =>
+            service.StreamChatMessageContentAsync(null, discourse, onStreamCompletion, chatSettings));
     }
 
     [Fact]
-    public async Task StreamChatMessageContentAsync_WithChatSettings_ShouldThrowArgumentNullException_WhenDiscourseIsNull()
+    public async Task
+        StreamChatMessageContentAsync_WithChatSettings_ShouldThrowArgumentNullException_WhenDiscourseIsNull()
     {
         var service = new ChatService(_config);
         var kernel = service.CreateKernel(Model);
         var chatSettings = new ChatSettings();
         Func<string, Task> onStreamCompletion = async _ => await Task.CompletedTask;
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => service.StreamChatMessageContentAsync(kernel, null, onStreamCompletion, chatSettings));
+        await Assert.ThrowsAsync<ArgumentNullException>(() =>
+            service.StreamChatMessageContentAsync(kernel, null, onStreamCompletion, chatSettings));
     }
 
     [Fact]
-    public async Task StreamChatMessageContentAsync_WithChatSettings_ShouldThrowArgumentNullException_WhenOnStreamCompletionIsNull()
+    public async Task
+        StreamChatMessageContentAsync_WithChatSettings_ShouldThrowArgumentNullException_WhenOnStreamCompletionIsNull()
     {
         var service = new ChatService(_config);
         var kernel = service.CreateKernel(Model);
         var discourse = new Discourse();
         var chatSettings = new ChatSettings();
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => service.StreamChatMessageContentAsync(kernel, discourse, null, chatSettings));
+        await Assert.ThrowsAsync<ArgumentNullException>(() =>
+            service.StreamChatMessageContentAsync(kernel, discourse, null, chatSettings));
     }
 
     [Fact]
@@ -80,7 +84,8 @@ public class ChatServiceTests
 
         using (var cts = new CancellationTokenSource())
         {
-            var task = service.StreamChatMessageContentAsync(kernel, discourse, onStreamCompletion, chatSettings, cts.Token);
+            var task = service.StreamChatMessageContentAsync(kernel, discourse, onStreamCompletion, chatSettings,
+                cts.Token);
             Assert.False(task.IsCompleted);
 
             cts.Cancel();
@@ -89,26 +94,6 @@ public class ChatServiceTests
         }
     }
 
-    [Fact]
-    public async Task StreamChatMessageContentAsync_WithChatSettings_ShouldProcessMessagesSuccessfully()
-    {
-        var service = new ChatService(_config);
-        var kernel = service.CreateKernel(Model);
-        var discourse = new Discourse();
-        var chatSettings = new ChatSettings();
-        discourse.AddChatMessage(MessageRole.User, "Hello", Model);
-        bool onStreamCompletionCalled = false;
-
-        Func<string, Task> onStreamCompletion = async message =>
-        {
-            onStreamCompletionCalled = true;
-            await Task.CompletedTask;
-        };
-
-        await service.StreamChatMessageContentAsync(kernel, discourse, onStreamCompletion, chatSettings);
-
-        Assert.True(onStreamCompletionCalled);
-    }
 
     [Fact]
     public async Task StreamChatMessageContentAsync_ShouldThrowArgumentNullException_WhenDiscourseIsNull()
@@ -159,7 +144,7 @@ public class ChatServiceTests
         var discourse = new Discourse();
         var chatSettings = new ChatSettings();
         discourse.AddChatMessage(MessageRole.User, "Hello", Model);
-        bool onStreamCompletionCalled = false;
+        var onStreamCompletionCalled = false;
 
         Func<string, Task> onStreamCompletion = async message =>
         {

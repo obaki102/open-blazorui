@@ -26,14 +26,14 @@
 
 .settings {
     display: block;
-    margin-right:60px;
-    position: fixed; 
+    margin-right: 60px;
+    position: fixed;
     right: 0;
     top: 60px;
-    width:300px;
+    width: 300px;
 }
 
-@media (max-width:1400px) {
+@media (max-width: 1400px) {
     .settings {
         display: none;
     }

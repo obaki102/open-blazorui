@@ -1,14 +1,13 @@
-﻿@using Microsoft.FluentUI.AspNetCore.Components
-@inject IJSRuntime JSRuntime
+﻿@inject IJSRuntime JSRuntime
 @implements IDialogContentComponent
 
-<FluentDesignTheme @bind-Mode="@themeMode" StorageName="theme" />
+<FluentDesignTheme @bind-Mode="@themeMode" StorageName="theme"/>
 
 <FluentDialogBody Style="overflow-x:hidden">
     <FluentGrid>
         <FluentGridItem>
             <FluentSelect Label="Theme" TOption="DesignThemeModes" Items="@(Enum.GetValues<DesignThemeModes>())"
-                          SelectedOption="@themeMode" SelectedOptionChanged="@OnThemeChange" />
+                          SelectedOption="@themeMode" SelectedOptionChanged="@OnThemeChange"/>
         </FluentGridItem>
 
 
@@ -21,12 +20,9 @@
 
 @code
 {
-    [CascadingParameter]
-    public DesignThemeModes themeMode { get; set; }
+    [CascadingParameter] public DesignThemeModes themeMode { get; set; }
 
-    [CascadingParameter]
-    public FluentDialog Dialog { get; set; } = default!;
-
+    [CascadingParameter] public FluentDialog Dialog { get; set; } = default!;
 
 
     private void OnThemeChange(DesignThemeModes selectedMode)

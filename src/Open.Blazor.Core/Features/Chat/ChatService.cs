@@ -1,19 +1,16 @@
-﻿
+﻿using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
-using Microsoft.Extensions.AI;
 using Open.Blazor.Core.Features.Shared;
-
 
 namespace Open.Blazor.Core.Features.Chat;
 
 internal sealed class ChatService
 {
-    private readonly Config _config;
-
     private readonly IChatClient _client;
+    private readonly Config _config;
 
     public ChatService(Config config)
     {
@@ -29,9 +26,9 @@ internal sealed class ChatService
 
         var kernelBuilder = Kernel.CreateBuilder()
             .AddOpenAIChatCompletion(
-                modelId: model,
-                endpoint: new Uri(_config.OllamaUrl),
-                apiKey: null);
+                model,
+                new Uri(_config.OllamaUrl),
+                null);
 
         return kernelBuilder.Build();
     }
@@ -56,39 +53,29 @@ internal sealed class ChatService
         await foreach (var completionResult in chatCompletion.GetStreamingChatMessageContentsAsync(history,
                            executionSettings, cancellationToken: cancellationToken))
         {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return;
-            }
+            if (cancellationToken.IsCancellationRequested) return;
 
             await onStreamCompletion.Invoke(completionResult.Content ?? string.Empty);
-
         }
     }
 
     public async Task StreamChatMessageContentAsync(Discourse discourse,
-       Func<string, Task> onStreamCompletion,
-       ChatSettings chatSettings,
-       CancellationToken cancellationToken = default)
+        Func<string, Task> onStreamCompletion,
+        ChatSettings chatSettings,
+        CancellationToken cancellationToken = default)
     {
-
         ArgumentNullException.ThrowIfNull(discourse);
         ArgumentNullException.ThrowIfNull(onStreamCompletion);
         ArgumentNullException.ThrowIfNull(chatSettings);
-
 
 
         var chatOptions = chatSettings.ToChatOptions();
         var history = discourse.ToChatMessages();
         await foreach (var completionResult in _client.CompleteStreamingAsync(history, chatOptions, cancellationToken))
         {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return;
-            }
+            if (cancellationToken.IsCancellationRequested) return;
 
             await onStreamCompletion.Invoke(completionResult.Text ?? string.Empty);
-
         }
     }
 }
@@ -103,4 +90,3 @@ public static class ChatServiceExensions
         return services;
     }
 }
-

@@ -32,9 +32,9 @@
     text-decoration: none;
 }
 
-    ::deep a:hover {
-        text-decoration: underline;
-    }
+::deep a:hover {
+    text-decoration: underline;
+}
 
 ::deep blockquote {
     color: #888;

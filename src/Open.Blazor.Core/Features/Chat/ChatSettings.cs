@@ -1,5 +1,4 @@
-﻿
-using Microsoft.Extensions.AI;
+﻿using Microsoft.Extensions.AI;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 
 namespace Open.Blazor.Core.Features.Chat;
@@ -41,26 +40,26 @@ public struct ChatSettings
         IList<string>? stopSequences,
         string? chatSystemPrompt)
     {
-        return new ChatSettings(temperature, topP, presencePenalty, frequencyPenalty, maxTokens, stopSequences, chatSystemPrompt);
+        return new ChatSettings(temperature, topP, presencePenalty, frequencyPenalty, maxTokens, stopSequences,
+            chatSystemPrompt);
     }
 
     public static ChatSettings Default()
     {
         return new ChatSettings(
-            temperature: 0.7, 
-            topP: 0.9,        
-            presencePenalty: 0.0,
-            frequencyPenalty: 0.0, 
-            maxTokens: 1000,   
-            stopSequences: null, 
-            chatSystemPrompt: "Default system prompt"
+            0.7,
+            0.9,
+            0.0,
+            0.0,
+            1000,
+            null,
+            "Default system prompt"
         );
     }
 }
 
 public static class ChatSettingsExtensions
 {
-
     public static OpenAIPromptExecutionSettings ToOpenAIPromptExecutionSettings(this ChatSettings chatSettings)
     {
         ArgumentNullException.ThrowIfNull(chatSettings);
@@ -74,7 +73,6 @@ public static class ChatSettingsExtensions
             MaxTokens = chatSettings.MaxTokens,
             StopSequences = chatSettings.StopSequences,
             ChatSystemPrompt = chatSettings.ChatSystemPrompt
-
         };
     }
 
@@ -89,9 +87,6 @@ public static class ChatSettingsExtensions
             PresencePenalty = (float)chatSettings.PresencePenalty,
             FrequencyPenalty = (float)chatSettings.FrequencyPenalty,
             StopSequences = chatSettings.StopSequences
-
-
         };
     }
 }
-

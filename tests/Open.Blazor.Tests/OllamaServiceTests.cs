@@ -15,7 +15,8 @@ public class MockHttpMessageHandler : DelegatingHandler
         _sendAsync = sendAsync ?? throw new ArgumentNullException(nameof(sendAsync));
     }
 
-    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+        CancellationToken cancellationToken)
     {
         return _sendAsync(request, cancellationToken);
     }
@@ -23,9 +24,9 @@ public class MockHttpMessageHandler : DelegatingHandler
 
 public class OllamaServiceTests
 {
-    private HttpResponseMessage _response;
     private readonly HttpClient _client;
     private readonly Config _config;
+    private HttpResponseMessage _response;
 
     public OllamaServiceTests()
     {
@@ -106,7 +107,7 @@ public class OllamaServiceTests
         var service = new OllamaService(_client, _config);
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => service.GetListOfLocalModelsAsync((string)null));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => service.GetListOfLocalModelsAsync(null));
     }
 
     [Fact]

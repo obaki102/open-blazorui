@@ -2,29 +2,31 @@
 @inject IMessageService MessageService
 @inject IDialogService DialogService
 
-<FluentToastProvider Position="ToastPosition.TopCenter" Timeout="10_000" />
-<FluentDialogProvider />
-<FluentTooltipProvider />
-<FluentDesignTheme OnLoaded="@OnLoaded" StorageName="theme" CustomColor="#FFFFFF" />
+<FluentToastProvider Position="ToastPosition.TopCenter" Timeout="10_000"/>
+<FluentDialogProvider/>
+<FluentTooltipProvider/>
+<FluentDesignTheme OnLoaded="@OnLoaded" StorageName="theme" CustomColor="#FFFFFF"/>
 <CascadingValue Value="@_themeMode">
     <FluentLayout>
         <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Start"
                      VerticalAlignment="VerticalAlignment.Center" Horizontal Gap="5">
             <FluentPopover Style="width: 300px;" AnchorId="header-label" @bind-Open="_visibleL" AutoFocus="false">
                 <Body>
-                  What to put?
+                What to put?
                 </Body>
                 <Footer>What to put 2?</Footer>
             </FluentPopover>
             <FluentButton Id="header-label" Appearance="Appearance.Stealth" Style="margin-top:10px;margin-left:20px" OnClick="() => _visibleL = !_visibleL">
-                <FluentLabel  Typo="Typography.Header" 
-                             Color="Color.Neutral" Weight="FontWeight.Bold"> open-blazorui</FluentLabel>
+                <FluentLabel Typo="Typography.Header"
+                             Color="Color.Neutral" Weight="FontWeight.Bold">
+                    open-blazorui
+                </FluentLabel>
             </FluentButton>
 
-            <FluentSpacer />
+            <FluentSpacer/>
 
             <FluentButton OnClick="OpenSettingsAsync" Title="Settings" Appearance="Appearance.Stealth" Style="margin-top:10px;margin-right:20px">
-                <FluentIcon Value="@(new Icons.Filled.Size20.Settings())"  Color="Color.Neutral" />
+                <FluentIcon Value="@(new Icons.Filled.Size20.Settings())" Color="Color.Neutral"/>
             </FluentButton>
         </FluentStack>
         <FluentStack Class="main" Orientation="Orientation.Horizontal" Width="100%">
@@ -33,7 +35,7 @@
                 <ErrorBoundary>
                     <ChildContent>
                         <div class="content">
-                            <FluentMessageBarProvider Section="@AppSection.MESSAGES_TOP" />
+                            <FluentMessageBarProvider Section="@AppSection.MESSAGES_TOP"/>
                             @Body
                         </div>
                     </ChildContent>
@@ -45,23 +47,26 @@
         </FluentStack>
     </FluentLayout>
 </CascadingValue>
+
 @code
 {
     bool _visibleL, _visibleR, _visibleM;
     private IDialogReference? _dialog;
     private DesignThemeModes _themeMode { get; set; }
-    private void OnLoaded(LoadedEventArgs e) =>
+
+    private void OnLoaded(LoadedEventArgs e)
+    {
         _themeMode = e.IsDark ? DesignThemeModes.Dark : DesignThemeModes.Light;
+    }
 
     private async Task OpenSettingsAsync()
     {
-        _dialog = await DialogService.ShowPanelAsync<SettingsPanel>(new DialogParameters()
-            {
-                Alignment = HorizontalAlignment.Right,
-                Title = "Settings",
-                PreventScroll = true
-            });
-        DialogResult result = await _dialog.Result;
-
+        _dialog = await DialogService.ShowPanelAsync<SettingsPanel>(new DialogParameters
+        {
+            Alignment = HorizontalAlignment.Right,
+            Title = "Settings",
+            PreventScroll = true
+        });
+        var result = await _dialog.Result;
     }
 }

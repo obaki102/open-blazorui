@@ -34,7 +34,7 @@
     Height: 300px;
 }
 
-@media (max-width:1400px) {
+@media (max-width: 1400px) {
     .settings {
         display: none;
     }
