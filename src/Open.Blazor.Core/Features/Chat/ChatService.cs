@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.AI;
+﻿
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.SemanticKernel;
@@ -9,26 +9,19 @@ namespace Open.Blazor.Core.Features.Chat;
 
 internal sealed class ChatService
 {
-    private readonly IChatClient _client;
+
     private readonly Config _config;
 
-    public ChatService(Config config)
-    {
-        _config = config;
-        //test
-        _client = new OllamaChatClient(new Uri(_config.OllamaUrl), "mistral:latest");
-    }
-
+    public ChatService(Config config) => _config = config;
+   
     public Kernel CreateKernel(string model)
     {
         ArgumentNullException.ThrowIfNull(model);
-#pragma warning disable SKEXP0010
 
         var kernelBuilder = Kernel.CreateBuilder()
-            .AddOpenAIChatCompletion(
+            .AddOllamaChatCompletion(
                 model,
-                new Uri(_config.OllamaUrl),
-                null);
+                new Uri(_config.OllamaUrl));
 
         return kernelBuilder.Build();
     }
@@ -56,26 +49,6 @@ internal sealed class ChatService
             if (cancellationToken.IsCancellationRequested) return;
 
             await onStreamCompletion.Invoke(completionResult.Content ?? string.Empty);
-        }
-    }
-
-    public async Task StreamChatMessageContentAsync(Discourse discourse,
-        Func<string, Task> onStreamCompletion,
-        ChatSettings chatSettings,
-        CancellationToken cancellationToken = default)
-    {
-        ArgumentNullException.ThrowIfNull(discourse);
-        ArgumentNullException.ThrowIfNull(onStreamCompletion);
-        ArgumentNullException.ThrowIfNull(chatSettings);
-
-
-        var chatOptions = chatSettings.ToChatOptions();
-        var history = discourse.ToChatMessages();
-        await foreach (var completionResult in _client.CompleteStreamingAsync(history, chatOptions, cancellationToken))
-        {
-            if (cancellationToken.IsCancellationRequested) return;
-
-            await onStreamCompletion.Invoke(completionResult.Text ?? string.Empty);
         }
     }
 }

@@ -37,10 +37,6 @@ public partial class Chat : ComponentBase, IDisposable
     private double _topP = 1;
     private string _userMessage = string.Empty;
 
-
-    [Parameter] public bool UseSemanticKernel { get; set; }
-
-
     [Inject] private ChatService ChatService { get; set; } = default!;
 
     [Inject] private OllamaService OllamaService { get; set; } = default!;
@@ -82,7 +78,7 @@ public partial class Chat : ComponentBase, IDisposable
         }
 
         var defaultModel = _activeOllamaModels.Models.First();
-        if (UseSemanticKernel) _kernel = ChatService.CreateKernel(defaultModel.Name);
+        _kernel = ChatService.CreateKernel(defaultModel.Name);
 
         _selectedModel = defaultModel;
         _cancellationTokenSource = new CancellationTokenSource();
@@ -117,12 +113,8 @@ public partial class Chat : ComponentBase, IDisposable
             var settings = ChatSettings.New(_temperature, _topP, _presencePenalty, _frequencyPenalty, _maxTokens,
                 default, _chatSystemPrompt);
 
-            if (UseSemanticKernel)
-                await ChatService.StreamChatMessageContentAsync(_kernel, _discourse, OnStreamCompletion, settings,
-                    _cancellationTokenSource.Token);
-            else
-                await ChatService.StreamChatMessageContentAsync(_discourse, OnStreamCompletion, settings,
-                    _cancellationTokenSource.Token);
+            await ChatService.StreamChatMessageContentAsync(_kernel, _discourse, OnStreamCompletion, settings,
+                _cancellationTokenSource.Token);
 
             _discourse.ChatMessages.Last().IsDoneStreaming = true;
         }
@@ -164,7 +156,7 @@ public partial class Chat : ComponentBase, IDisposable
     private void HandleSelectedOptionChanged(OllamaModel selectedModelChanged)
     {
         _selectedModel = selectedModelChanged;
-        if (UseSemanticKernel) _kernel = ChatService.CreateKernel(_selectedModel.Name);
+        _kernel = ChatService.CreateKernel(_selectedModel.Name);
     }
 
     private async Task StopChat()
@@ -175,7 +167,7 @@ public partial class Chat : ComponentBase, IDisposable
     private async Task ScrollToBottom()
     {
         await JsRuntime.InvokeVoidAsync("ScrollToBottom", "chat-window");
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 
     private void OnSpeechRecognized(object? sender, SpeechRecognitionEventArgs args)

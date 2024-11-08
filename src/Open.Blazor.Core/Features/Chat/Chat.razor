@@ -23,16 +23,15 @@
                 <p>What it is: Think of it as a measure of creativity. </p>
                 <p>How it works: Lower values make the model's responses more predictable and focused, while higher values make the responses more diverse and creative. </p>
             </FluentTooltip>
-            @if (UseSemanticKernel)
-            {
-                <FluentSlider Id="max-token-control" Label="@($"Max Tokens: {_maxTokens}")" @bind-Value="_maxTokens" Min="0" Max="4000" Step="10" Style="margin:5px"/>
-                <FluentTooltip Anchor="max-token-control"
-                               Delay="300"
-                               Position="TooltipPosition.Start">
-                    <p>What it is: Limits the length of the response. </p>
-                    <p>How it works: It sets a maximum number of words or parts of words the model can generate in its response. </p>
-                </FluentTooltip>
-            }
+
+            <FluentSlider Id="max-token-control" Label="@($"Max Tokens: {_maxTokens}")" @bind-Value="_maxTokens" Min="0" Max="4000" Step="10" Style="margin:5px"/>
+            <FluentTooltip Anchor="max-token-control"
+                           Delay="300"
+                           Position="TooltipPosition.Start">
+                <p>What it is: Limits the length of the response. </p>
+                <p>How it works: It sets a maximum number of words or parts of words the model can generate in its response. </p>
+            </FluentTooltip>
+
             <FluentSlider Id="topp-control" Label="@($"Top P: {_topP}")" @bind-Value="_topP" Min="0" Max="2" Step=".1" Style="margin:5px"/>
             <FluentTooltip Anchor="topp-control"
                            Delay="300"
@@ -54,16 +53,14 @@
                 <p>What it is: Similar to the presence penalty but focuses on how often words are used. </p>
                 <p>How it works: It discourages the model from using words too frequently, making the output more diverse. </p>
             </FluentTooltip>
-            @if (UseSemanticKernel)
-            {
-                <FluentTextArea Id="system-prompt-control" Label="System Prompt" @bind-Value="_chatSystemPrompt" Cols="150"></FluentTextArea>
-                <FluentTooltip Anchor="system-prompt-control"
-                               Delay="300"
-                               Position="TooltipPosition.Start">
-                    <p>What it is: Information about the person using the model. </p>
-                    <p>How it works: It might personalize the responses based on the user's identity or preferences. </p>
-                </FluentTooltip>
-            }
+
+            <FluentTextArea Id="system-prompt-control" Label="System Prompt" @bind-Value="_chatSystemPrompt" Cols="150"></FluentTextArea>
+            <FluentTooltip Anchor="system-prompt-control"
+                           Delay="300"
+                           Position="TooltipPosition.Start">
+                <p>What it is: Information about the person using the model. </p>
+                <p>How it works: It might personalize the responses based on the user's identity or preferences. </p>
+            </FluentTooltip>
 
 
         </FluentCard>

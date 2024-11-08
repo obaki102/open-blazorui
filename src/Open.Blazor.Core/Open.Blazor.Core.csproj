@@ -4,6 +4,8 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <NoWarn>SKEXP0010</NoWarn>
+        <NoWarn>SKEXP0070</NoWarn>
     </PropertyGroup>
 
 
@@ -15,12 +17,13 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.10" />
         <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.10.2" />
         <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.10.2" />
-        <PackageReference Include="Microsoft.SemanticKernel" Version="1.25.0" />
-        <PackageReference Include="Microsoft.SemanticKernel.Planners.Handlebars" Version="1.14.1-preview"/>
-        <PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.14.1-alpha"/>
+        <PackageReference Include="Microsoft.SemanticKernel" Version="1.28.0" />
+        <PackageReference Include="Microsoft.SemanticKernel.Planners.Handlebars" Version="1.28.0-preview"/>
+        <PackageReference Include="Microsoft.SemanticKernel.Plugins.Core" Version="1.28.0-alpha"/>
+        <PackageReference Include="Microsoft.SemanticKernel.Connectors.Ollama" Version="1.28.0-alpha" />
         <PackageReference Include="Markdig" Version="0.37.0"/>
         <PackageReference Include="Toolbelt.Blazor.SpeechRecognition" Version="1.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.AI.Ollama" Version="9.0.0-preview.9.24507.7"/>
+
     </ItemGroup>
 
 
