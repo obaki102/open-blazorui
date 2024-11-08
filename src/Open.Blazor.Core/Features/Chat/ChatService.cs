@@ -43,14 +43,18 @@ internal sealed class ChatService
         var executionSettings = chatSettings.ToOpenAIPromptExecutionSettings();
         var history = discourse.ToChatHistory();
 
-        await foreach (var completionResult in chatCompletion.GetStreamingChatMessageContentsAsync(history,
-                           executionSettings, cancellationToken: cancellationToken))
+        var chatCompletionStream = chatCompletion.GetStreamingChatMessageContentsAsync(history, executionSettings, cancellationToken: cancellationToken);
+
+        await foreach (var completionResult in chatCompletionStream)
         {
             if (cancellationToken.IsCancellationRequested) return;
 
-            await onStreamCompletion.Invoke(completionResult.Content ?? string.Empty);
+            if (!string.IsNullOrEmpty(completionResult.Content))
+            {
+                await onStreamCompletion.Invoke(completionResult.Content);
+            }
         }
-    }
+    public async Task StreamChatMessageContentAsync(Kernel kernel,
 }
 
 public static class ChatServiceExensions
