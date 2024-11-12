@@ -58,7 +58,7 @@
     {
         await JsRuntime!.InvokeVoidAsync("navigator.clipboard.writeText", Message.Content);
         if (!string.IsNullOrEmpty(Message.Content))
-            ToastService!.ShowSuccess("Copying to clipboard was successful!");
+            ToastService!.ShowSuccess("Copied to clipboard.");
         else
             ToastService!.ShowError("Clipboard's empty");
     }

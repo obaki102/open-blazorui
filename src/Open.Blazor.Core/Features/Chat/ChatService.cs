@@ -1,5 +1,4 @@
-﻿
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -9,11 +8,10 @@ namespace Open.Blazor.Core.Features.Chat;
 
 internal sealed class ChatService
 {
-
     private readonly Config _config;
 
     public ChatService(Config config) => _config = config;
-   
+
     public Kernel CreateKernel(string model)
     {
         ArgumentNullException.ThrowIfNull(model);
@@ -42,12 +40,13 @@ internal sealed class ChatService
 
         var executionSettings = chatSettings.ToOpenAIPromptExecutionSettings();
         var history = discourse.ToChatHistory();
-
-        await foreach (var completionResult in chatCompletion.GetStreamingChatMessageContentsAsync(history,
-                           executionSettings, cancellationToken: cancellationToken))
+        var chatCompletionStream =
+            chatCompletion.GetStreamingChatMessageContentsAsync(history, executionSettings,
+                cancellationToken: cancellationToken);
+        await foreach (var completionResult in chatCompletionStream)
         {
             if (cancellationToken.IsCancellationRequested) return;
-
+            
             await onStreamCompletion.Invoke(completionResult.Content ?? string.Empty);
         }
     }

@@ -129,13 +129,11 @@ public partial class Chat : ComponentBase, IDisposable
             _isChatOngoing = false;
         }
     }
-
-
-    //See if this can be optimize further
-    private Task OnStreamCompletion(string updatedContent)
+    
+    private async Task OnStreamCompletion(string updatedContent)
     {
         _discourse.ChatMessages.Last().Content += updatedContent;
-        return Task.CompletedTask;
+        await ScrollToBottom();
     }
 
     private void ResetCancellationTokenSource()
