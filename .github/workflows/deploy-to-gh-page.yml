@@ -19,10 +19,7 @@ jobs:
   
       - uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '9.0.x'
-          
-      - name: Restore dependencies
-        run: dotnet restore
+          dotnet-version: '9.0.x'       
   
       - name: Dotnet Publish
         run: dotnet publish --configuration Release --framework net9.0
