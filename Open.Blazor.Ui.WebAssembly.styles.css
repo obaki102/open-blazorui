@@ -1,0 +1,45 @@
+@import '_content/Microsoft.FluentUI.AspNetCore.Components/Microsoft.FluentUI.AspNetCore.Components.dwk6czdzfo.bundle.scp.css';
+@import '_content/Open.Blazor.Core/Open.Blazor.Core.xspvilzgov.bundle.scp.css';
+
+/* /Features/Chat/ChatWebAssembly.razor.rz.scp.css */
+
+#chat-window[b-yycmwhwz6z] {
+    width: 100%;
+    height: 90%;
+    margin: 0 auto;
+    overflow-y: auto;
+    padding: 10px;
+    overflow-x: hidden;
+}
+
+.chat-box-container[b-yycmwhwz6z] {
+    max-width: 700px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    box-sizing: border-box;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+
+.settings[b-yycmwhwz6z] {
+    display: block;
+    margin-right: 60px;
+    position: fixed;
+    right: 0;
+    top: 60px;
+    width: 300px;
+    Height: 300px;
+}
+
+@media (max-width: 1400px) {
+    .settings[b-yycmwhwz6z] {
+        display: none;
+    }
+}
