@@ -11,7 +11,13 @@ namespace Open.Blazor.Core.Features.Chat;
 
 public partial class Chat : ComponentBase, IDisposable
 {
-    private Ollama? _activeOllamaModels = default!;
+    private ChatService _chatService;
+    private OllamaService _ollamaService;
+    private IToastService _toastService;
+    private IJSRuntime _jsRuntime;
+    private SpeechRecognition _speechRecognition;
+
+    private Ollama? _activeOllamaModels;
     private CancellationTokenSource _cancellationTokenSource = default!;
     private string? _chatSystemPrompt;
     private Discourse _discourse = new();
@@ -27,7 +33,7 @@ public partial class Chat : ComponentBase, IDisposable
     private double _presencePenalty;
 
     //Speech recognition
-    private SpeechRecognitionResult[] _results = Array.Empty<SpeechRecognitionResult>();
+    private SpeechRecognitionResult[] _results = [];
     private OllamaModel _selectedModel = default!;
 
     private IList<string> _stopSequences = default!;
@@ -37,31 +43,33 @@ public partial class Chat : ComponentBase, IDisposable
     private double _topP = 1;
     private string _userMessage = string.Empty;
 
-    [Inject] private ChatService ChatService { get; set; } = default!;
-
-    [Inject] private OllamaService OllamaService { get; set; } = default!;
-
-    [Inject] public required IToastService ToastService { get; set; }
-
-    [Inject] public required IJSRuntime JsRuntime { get; set; }
-
-
-    [Inject] public required SpeechRecognition SpeechRecognition { get; set; }
+    public Chat(ChatService chatService,
+        OllamaService olamaService,
+        IToastService toastService,
+        IJSRuntime jsRuntime,
+        SpeechRecognition speechRecognition)
+    {
+        _chatService = chatService;
+        _ollamaService = olamaService;
+        _toastService = toastService;
+        _jsRuntime = jsRuntime;
+        _speechRecognition = speechRecognition;
+    }
 
     public void Dispose()
     {
         _cancellationTokenSource?.Dispose();
-        SpeechRecognition.Result -= OnSpeechRecognized!;
+        _speechRecognition.Result -= OnSpeechRecognized!;
     }
 
     protected override async Task OnInitializedAsync()
     {
-        SpeechRecognition.Lang = "en-US";
-        SpeechRecognition.InterimResults = false;
-        SpeechRecognition.Continuous = true;
-        SpeechRecognition.Result += OnSpeechRecognized;
+        _speechRecognition.Lang = "en-US";
+        _speechRecognition.InterimResults = false;
+        _speechRecognition.Continuous = true;
+        _speechRecognition.Result += OnSpeechRecognized;
 
-        var result = await OllamaService.GetListOfLocalModelsAsync();
+        var result = await _ollamaService.GetListOfLocalModelsAsync();
 
         if (!result.IsSuccess)
         {
@@ -78,7 +86,7 @@ public partial class Chat : ComponentBase, IDisposable
         }
 
         var defaultModel = _activeOllamaModels.Models.First();
-        _kernel = ChatService.CreateKernel(defaultModel.Name);
+        _kernel = _chatService.CreateKernel(defaultModel.Name);
 
         _selectedModel = defaultModel;
         _cancellationTokenSource = new CancellationTokenSource();
@@ -88,7 +96,7 @@ public partial class Chat : ComponentBase, IDisposable
     {
         if (firstRender)
         {
-            _isSpeechAvailable = await SpeechRecognition.IsAvailableAsync();
+            _isSpeechAvailable = await _speechRecognition.IsAvailableAsync();
             StateHasChanged();
         }
 
@@ -113,7 +121,7 @@ public partial class Chat : ComponentBase, IDisposable
             var settings = ChatSettings.New(_temperature, _topP, _presencePenalty, _frequencyPenalty, _maxTokens,
                 default, _chatSystemPrompt);
 
-            await ChatService.StreamChatMessageContentAsync(_kernel, _discourse, OnStreamCompletion, settings,
+            await _chatService.StreamChatMessageContentAsync(_kernel, _discourse, OnStreamCompletion, settings,
                 _cancellationTokenSource.Token);
 
             _discourse.ChatMessages.Last().IsDoneStreaming = true;
@@ -129,7 +137,7 @@ public partial class Chat : ComponentBase, IDisposable
             _isChatOngoing = false;
         }
     }
-    
+
     private async Task OnStreamCompletion(string updatedContent)
     {
         _discourse.ChatMessages.Last().Content += updatedContent;
@@ -147,14 +155,14 @@ public partial class Chat : ComponentBase, IDisposable
 
     private void ShowError(string errorMessage)
     {
-        ToastService.ShowError(errorMessage);
+        _toastService.ShowError(errorMessage);
     }
 
 
     private void HandleSelectedOptionChanged(OllamaModel selectedModelChanged)
     {
         _selectedModel = selectedModelChanged;
-        _kernel = ChatService.CreateKernel(_selectedModel.Name);
+        _kernel = _chatService.CreateKernel(_selectedModel.Name);
     }
 
     private async Task StopChat()
@@ -164,7 +172,7 @@ public partial class Chat : ComponentBase, IDisposable
 
     private async Task ScrollToBottom()
     {
-        await JsRuntime.InvokeVoidAsync("ScrollToBottom", "chat-window");
+        await _jsRuntime.InvokeVoidAsync("ScrollToBottom", "chat-window");
         await InvokeAsync(StateHasChanged);
     }
 
@@ -202,8 +210,8 @@ public partial class Chat : ComponentBase, IDisposable
         if (!_isListening)
         {
             _isListening = true;
-            await SpeechRecognition.StartAsync();
-            ToastService.ShowSuccess("Listening");
+            await _speechRecognition.StartAsync();
+            _toastService.ShowSuccess("Listening");
         }
     }
 
@@ -215,8 +223,8 @@ public partial class Chat : ComponentBase, IDisposable
         if (_isListening)
         {
             _isListening = false;
-            await SpeechRecognition.StopAsync();
-            ToastService.ShowWarning("Stopped Listening");
+            await _speechRecognition.StopAsync();
+            _toastService.ShowWarning("Stopped Listening");
         }
     }
 }

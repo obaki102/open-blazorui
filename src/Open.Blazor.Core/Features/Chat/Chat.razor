@@ -70,7 +70,7 @@
 
         @foreach (var message in _discourse.ChatMessages)
         {
-            <ChatContent Message="message" ToastService="ToastService" JsRuntime="JsRuntime"/>
+            <ChatContent Message="message" ToastService="_toastService" JsRuntime="_jsRuntime"/>
         }
 
     </div>

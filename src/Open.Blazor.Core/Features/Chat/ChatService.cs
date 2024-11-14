@@ -6,7 +6,7 @@ using Open.Blazor.Core.Features.Shared;
 
 namespace Open.Blazor.Core.Features.Chat;
 
-internal sealed class ChatService
+public sealed class ChatService
 {
     private readonly Config _config;
 
