@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.AI;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -9,8 +10,13 @@ namespace Open.Blazor.Core.Features.Chat;
 public sealed class ChatService
 {
     private readonly Config _config;
+    private readonly IChatClient _client;
 
-    public ChatService(Config config) => _config = config;
+    public ChatService(Config config, IChatClient client)
+    {
+        _config = config;
+        _client = client;
+    }
 
     public Kernel CreateKernel(string model)
     {
@@ -46,10 +52,27 @@ public sealed class ChatService
         await foreach (var completionResult in chatCompletionStream)
         {
             if (cancellationToken.IsCancellationRequested) return;
-            
+
             await onStreamCompletion.Invoke(completionResult.Content ?? string.Empty);
         }
     }
+
+    public async Task StreamChatMessageContentAsync(Discourse discourse,
+        Func<string, Task> onStreamCompletion,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(discourse);
+        ArgumentNullException.ThrowIfNull(onStreamCompletion);
+      
+        var history = discourse.ToChatMessages();
+        await foreach (var completionResult in _client.CompleteStreamingAsync(history, null, cancellationToken))
+        {
+            if (cancellationToken.IsCancellationRequested) return;
+
+            await onStreamCompletion.Invoke(completionResult.Text ?? string.Empty);
+        }
+    }
+    public string GetCurrentModel => _client.Metadata.ModelId ?? "No Model Found";
 }
 
 public static class ChatServiceExensions

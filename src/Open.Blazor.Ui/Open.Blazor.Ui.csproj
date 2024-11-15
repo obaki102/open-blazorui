@@ -23,6 +23,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Open.Blazor.Core\Open.Blazor.Core.csproj"/>
+        <ProjectReference Include="..\Open.Blazor.ServiceDefaults\Open.Blazor.ServiceDefaults.csproj" />
     </ItemGroup>
 
 

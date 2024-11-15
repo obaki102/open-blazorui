@@ -3,7 +3,8 @@ using Open.Blazor.Ui;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.AddServiceDefaults();
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
@@ -22,9 +23,11 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
+app.MapDefaultEndpoints();
 app.Run();

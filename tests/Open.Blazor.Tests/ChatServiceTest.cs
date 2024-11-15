@@ -16,21 +16,21 @@ public class ChatServiceTests
     [Fact]
     public void Constructor_ShouldInitialize_WhenParametersAreValid()
     {
-        var service = new ChatService(_config);
+        var service = new ChatService(_config,null);
         Assert.NotNull(service);
     }
 
     [Fact]
     public void CreateKernel_ShouldThrowArgumentNullException_WhenModelIsNull()
     {
-        var service = new ChatService(_config);
+        var service = new ChatService(_config,null);
         Assert.Throws<ArgumentNullException>(() => service.CreateKernel(null));
     }
 
     [Fact]
     public void CreateKernel_ShouldReturnKernel_WhenModelIsValid()
     {
-        var service = new ChatService(_config);
+        var service = new ChatService(_config,null);
         var kernel = service.CreateKernel(Model);
         Assert.NotNull(kernel);
     }
@@ -38,7 +38,7 @@ public class ChatServiceTests
     [Fact]
     public async Task StreamChatMessageContentAsync_WithChatSettings_ShouldThrowArgumentNullException_WhenKernelIsNull()
     {
-        var service = new ChatService(_config);
+        var service = new ChatService(_config,null);
         var discourse = new Discourse();
         var chatSettings = new ChatSettings();
         Func<string, Task> onStreamCompletion = async _ => await Task.CompletedTask;
@@ -51,7 +51,7 @@ public class ChatServiceTests
     public async Task
         StreamChatMessageContentAsync_WithChatSettings_ShouldThrowArgumentNullException_WhenDiscourseIsNull()
     {
-        var service = new ChatService(_config);
+        var service = new ChatService(_config,null);
         var kernel = service.CreateKernel(Model);
         var chatSettings = new ChatSettings();
         Func<string, Task> onStreamCompletion = async _ => await Task.CompletedTask;
@@ -64,7 +64,7 @@ public class ChatServiceTests
     public async Task
         StreamChatMessageContentAsync_WithChatSettings_ShouldThrowArgumentNullException_WhenOnStreamCompletionIsNull()
     {
-        var service = new ChatService(_config);
+        var service = new ChatService(_config,null);
         var kernel = service.CreateKernel(Model);
         var discourse = new Discourse();
         var chatSettings = new ChatSettings();
@@ -76,7 +76,7 @@ public class ChatServiceTests
     [Fact]
     public async Task StreamChatMessageContentAsync_WithChatSettings_ShouldReturnDiscourse_WhenCancellationIsRequested()
     {
-        var service = new ChatService(_config);
+        var service = new ChatService(_config,null);
         var kernel = service.CreateKernel(Model);
         var discourse = new Discourse();
         var chatSettings = new ChatSettings();
@@ -93,5 +93,27 @@ public class ChatServiceTests
             await Assert.ThrowsAsync<TaskCanceledException>(() => task);
         }
     }
-   
+
+    [Fact]
+    public async Task StreamChatMessageContentAsync_ShouldThrowArgumentNullException_WhenDiscourseIsNull()
+    {
+        var service = new ChatService(_config,null);
+        var chatSettings = new ChatSettings();
+        Func<string, Task> onStreamCompletion = async _ => await Task.CompletedTask;
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() =>
+            service.StreamChatMessageContentAsync(null, onStreamCompletion));
+    }
+
+    [Fact]
+    public async Task StreamChatMessageContentAsync_ShouldThrowArgumentNullException_WhenOnStreamCompletionIsNull()
+    {
+        var service = new ChatService(_config,null);
+        var discourse = new Discourse();
+        var chatSettings = new ChatSettings();
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() =>
+            service.StreamChatMessageContentAsync(discourse, null));
+    }
+    
 }
