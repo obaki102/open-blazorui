@@ -22,10 +22,10 @@ public partial class Chat : ComponentBase, IDisposable
     private string? _chatSystemPrompt;
     private Discourse _discourse = new();
     private double _frequencyPenalty;
-    private bool _isChatOngoing = false;
-    private bool _isListening = false;
-    private bool _isOllamaUp = false;
-  
+    private bool _isChatOngoing;
+    private bool _isListening;
+    private bool _isOllamaUp;
+
     //todo support history
     private Kernel _kernel = default!;
     private int _maxTokens = 2000;
@@ -43,14 +43,16 @@ public partial class Chat : ComponentBase, IDisposable
     private double _topP = 1;
     private string _userMessage = string.Empty;
 
+    [CascadingParameter] public OllamaHostMode OllamaHostMode { get; set; }
+
     public Chat(ChatService chatService,
-        OllamaService olamaService,
+        OllamaService ollamaService,
         IToastService toastService,
         IJSRuntime jsRuntime,
         SpeechRecognition speechRecognition)
     {
         _chatService = chatService;
-        _ollamaService = olamaService;
+        _ollamaService = ollamaService;
         _toastService = toastService;
         _jsRuntime = jsRuntime;
         _speechRecognition = speechRecognition;
@@ -69,26 +71,28 @@ public partial class Chat : ComponentBase, IDisposable
         _speechRecognition.Continuous = true;
         _speechRecognition.Result += OnSpeechRecognized;
 
-        var result = await _ollamaService.GetListOfLocalModelsAsync();
-
-        if (!result.IsSuccess)
+        if (OllamaHostMode == OllamaHostMode.Local)
         {
-            ShowError("Ollama service is down. Please ensure Ollama is up and running.");
-            return;
+            var result = await _ollamaService.GetListOfLocalModelsAsync();
+
+            if (!result.IsSuccess)
+            {
+                ShowError("Ollama service is down. Please ensure Ollama is up and running.");
+                return;
+            }
+
+            _activeOllamaModels = result.Value;
+
+            if (_activeOllamaModels is null || _activeOllamaModels.Models.Count == 0)
+            {
+                ShowError("No models found");
+                return;
+            }
+
+            var defaultModel = _activeOllamaModels.Models.First();
+            _kernel = _chatService.CreateKernel(defaultModel.Name);
+            _selectedModel = defaultModel;
         }
-
-        _activeOllamaModels = result.Value ?? default!;
-
-        if (_activeOllamaModels is null || _activeOllamaModels.Models.Count == 0)
-        {
-            ShowError("No models found");
-            return;
-        }
-
-        var defaultModel = _activeOllamaModels.Models.First();
-        _kernel = _chatService.CreateKernel(defaultModel.Name);
-        _selectedModel = defaultModel;
-        
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -109,26 +113,35 @@ public partial class Chat : ComponentBase, IDisposable
         try
         {
             if (string.IsNullOrWhiteSpace(_userMessage)) return;
+
             _isChatOngoing = true;
-            _discourse.AddChatMessage(MessageRole.User, _userMessage, _selectedModel.Name);
-            _discourse.AddChatMessage(MessageRole.Assistant, string.Empty, _selectedModel.Name);
-
+            var modelName = OllamaHostMode == OllamaHostMode.Aspire ? _chatService.GetCurrentModel : _selectedModel.Name;
+            _discourse.AddChatMessage(MessageRole.User, _userMessage, modelName);
+            _discourse.AddChatMessage(MessageRole.Assistant, string.Empty, modelName);
             _userMessage = string.Empty;
-
             await StopListening();
 
-            var settings = ChatSettings.New(_temperature, _topP, _presencePenalty, _frequencyPenalty, _maxTokens,
-                default, _chatSystemPrompt);
+            if (OllamaHostMode == OllamaHostMode.Aspire)
+            {
+                await _chatService.StreamChatMessageContentAsync(
+                    _discourse, OnStreamCompletion, _cancellationTokenSource.Token);
+            }
+            else
+            {
+                var settings = ChatSettings.New(
+                    _temperature, _topP, _presencePenalty, _frequencyPenalty,
+                    _maxTokens, default, _chatSystemPrompt);
 
-            await _chatService.StreamChatMessageContentAsync(_kernel, _discourse, OnStreamCompletion, settings,
-                _cancellationTokenSource.Token);
+                await _chatService.StreamChatMessageContentAsync(
+                    _kernel, _discourse, OnStreamCompletion, settings,
+                    _cancellationTokenSource.Token);
+            }
 
             _discourse.ChatMessages.Last().IsDoneStreaming = true;
         }
         catch (Exception ex)
         {
-            //todo implement logger
-            ShowError(ex.Message);
+            Console.WriteLine($"Error in SendMessage: {ex.Message}");
         }
         finally
         {
@@ -158,8 +171,9 @@ public partial class Chat : ComponentBase, IDisposable
     }
 
 
-    private void HandleSelectedOptionChanged(OllamaModel selectedModelChanged)
+    private void HandleSelectedOptionChanged(OllamaModel? selectedModelChanged)
     {
+        if (selectedModelChanged is null) return;
         _selectedModel = selectedModelChanged;
         _kernel = _chatService.CreateKernel(_selectedModel.Name);
     }
